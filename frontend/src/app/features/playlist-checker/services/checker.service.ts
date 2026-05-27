@@ -30,6 +30,18 @@ export class CheckerService {
   showUnavailableOnly = signal<boolean>(false);
 
   /**
+   * Total number of tracks processed so far
+   */
+  totalTracks = computed(() => this.tracksSignal().length);
+
+  /**
+   * Total number of unavailable tracks found
+   */
+  unavailableTracksCount = computed(
+    () => this.tracksSignal().filter((track) => track.isUnavailable).length
+  );
+
+  /**
    * Computed signal that returns filtered tracks based on the toggle status
    */
   filteredTracks = computed(() => {

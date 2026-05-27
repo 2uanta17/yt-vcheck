@@ -43,13 +43,28 @@
           Scan Playlist
         </button>
 
-        <mat-slide-toggle
-          [checked]="checkerService.showUnavailableOnly()"
-          (change)="onToggleFilter($event.checked)"
-          color="accent"
-        >
-          Show Unavailable Only
-        </mat-slide-toggle>
+        <div class="stats-toggle-group">
+          @if (checkerService.totalTracks() > 0) {
+            <mat-chip-set class="stats-chips">
+              <mat-chip highlighted>
+                <span class="chip-label">Total:</span>
+                <strong>{{ checkerService.totalTracks() }}</strong>
+              </mat-chip>
+              <mat-chip [color]="checkerService.unavailableTracksCount() > 0 ? 'warn' : ''" [highlighted]="checkerService.unavailableTracksCount() > 0">
+                <span class="chip-label">Unavailable:</span>
+                <strong>{{ checkerService.unavailableTracksCount() }}</strong>
+              </mat-chip>
+            </mat-chip-set>
+          }
+
+          <mat-slide-toggle
+            [checked]="checkerService.showUnavailableOnly()"
+            (change)="onToggleFilter($event.checked)"
+            color="accent"
+          >
+            Show Unavailable Only
+          </mat-slide-toggle>
+        </div>
       </div>
     </mat-card-content>
 

@@ -1,5 +1,5 @@
-import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,7 +36,11 @@ export class TrackTableComponent {
 
   searchYouTube(track: Track): void {
     const query = encodeURIComponent(`${track.title} ${track.channelTitle}`);
-    window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank', 'noopener,noreferrer');
+    window.open(
+      `https://www.youtube.com/results?search_query=${query}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
   }
 
   searchGoogle(track: Track): void {

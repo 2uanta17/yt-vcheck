@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatChipsModule } from '@angular/material/chips';
 import { TrackTableComponent } from './components/track-table/track-table.component';
 import { CheckerService } from './services/checker.service';
 
@@ -26,6 +27,7 @@ import { CheckerService } from './services/checker.service';
     MatSlideToggleModule,
     MatProgressBarModule,
     MatIconModule,
+    MatChipsModule,
     TrackTableComponent,
   ],
 })
