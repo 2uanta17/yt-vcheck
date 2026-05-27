@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +12,11 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TrackTableComponent } from './components/track-table/track-table.component';
 import { CheckerService } from './services/checker.service';
 import { parsePlaylistId } from './utils/playlist-id-parser';
+
+const STORAGE_KEYS = {
+  PLAYLIST_ID: 'yt_vcheck_playlist_id',
+  API_KEY: 'yt_vcheck_api_key',
+};
 
 @Component({
   selector: 'app-playlist-checker',
@@ -36,9 +41,32 @@ export class PlaylistCheckerComponent {
   checkerService = inject(CheckerService);
 
   // Local signals for form inputs
-  playlistId = signal('');
-  apiKey = signal('');
+  playlistId = signal(this.getInitialValue(STORAGE_KEYS.PLAYLIST_ID));
+  apiKey = signal(this.getInitialValue(STORAGE_KEYS.API_KEY));
   idError = signal<string | null>(null);
+
+  constructor() {
+    // Automatically save to localStorage when signals change
+    effect(() => {
+      const pId = this.playlistId();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.PLAYLIST_ID, pId);
+      }
+    });
+    effect(() => {
+      const key = this.apiKey();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.API_KEY, key);
+      }
+    });
+  }
+
+  private getInitialValue(key: string): string {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(key) || '';
+    }
+    return '';
+  }
 
   /**
    * Executes the playlist scan using the service

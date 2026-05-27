@@ -1,11 +1,14 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, effect, signal } from '@angular/core';
 import { Track } from '../models/track.model';
+
+const CACHE_KEY = 'yt_vcheck_last_results';
+const TOGGLE_KEY = 'yt_vcheck_toggle_state';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CheckerService {
-  private tracksSignal = signal<Track[]>([]);
+  private tracksSignal = signal<Track[]>(this.loadCache());
   private loading = signal<boolean>(false);
   private error = signal<string | null>(null);
 
@@ -27,7 +30,14 @@ export class CheckerService {
   /**
    * Filter toggle to show only unavailable tracks
    */
-  showUnavailableOnly = signal<boolean>(false);
+  showUnavailableOnly = signal<boolean>(this.getInitialToggle());
+
+  private getInitialToggle(): boolean {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(TOGGLE_KEY) === 'true';
+    }
+    return false;
+  }
 
   /**
    * Total number of tracks processed so far
@@ -55,7 +65,33 @@ export class CheckerService {
     return tracks;
   });
 
-  constructor() {}
+  private loadCache(): Track[] {
+    if (typeof window === 'undefined') return [];
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private saveCache(tracks: Track[]): void {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(tracks));
+    } catch (e) {
+      console.error('Failed to save to cache', e);
+    }
+  }
+
+  constructor() {
+    effect(() => {
+      const val = this.showUnavailableOnly();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(TOGGLE_KEY, String(val));
+      }
+    });
+  }
 
   /**
    * Triggers the playlist check process using a streaming approach
@@ -68,6 +104,7 @@ export class CheckerService {
     this.loading.set(true);
     this.error.set(null);
     this.tracksSignal.set([]);
+    this.saveCache([]); // Clear cache on new scan
 
     try {
       const response = await fetch('/api/playlists/check', {
@@ -93,7 +130,11 @@ export class CheckerService {
 
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          // Final save on completion
+          this.saveCache(this.tracksSignal());
+          break;
+        }
 
         buffer += decoder.decode(value, { stream: true });
 
