@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +12,14 @@ import { Track } from '../../models/track.model';
   templateUrl: './track-table.component.html',
   styleUrl: './track-table.component.scss',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatChipsModule, MatButtonModule, MatIconModule],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatChipsModule,
+    MatButtonModule,
+    MatIconModule,
+    ScrollingModule,
+  ],
 })
 export class TrackTableComponent {
   tracks = input.required<Track[]>();
