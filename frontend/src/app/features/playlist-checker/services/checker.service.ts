@@ -6,7 +6,7 @@ import { Track } from '../models/track.model';
 })
 export class CheckerService {
   private tracksSignal = signal<Track[]>([]);
-  private isLoadingSignal = signal<boolean>(false);
+  private loading = signal<boolean>(false);
 
   /**
    * Read-only signal of all tracks
@@ -16,7 +16,7 @@ export class CheckerService {
   /**
    * Read-only signal for loading state
    */
-  isLoading = this.isLoadingSignal.asReadonly();
+  isLoading = this.loading.asReadonly();
 
   /**
    * Filter toggle to show only unavailable tracks
@@ -40,39 +40,85 @@ export class CheckerService {
   constructor() {}
 
   /**
-   * Triggers the playlist check process
+   * Triggers the playlist check process using a streaming approach
    * @param playlistId The ID of the YouTube playlist
    * @param apiKey Optional API key for restricted content
    */
-  checkPlaylist(playlistId: string, apiKey?: string): void {
-    console.log(`Checking playlist: ${playlistId}`);
-    this.isLoadingSignal.set(true);
+  async checkPlaylist(playlistId: string, apiKey?: string): Promise<void> {
+    if (!playlistId) return;
 
-    // Placeholder mock data
-    const mockTracks: Track[] = [
-      {
-        videoId: 'dQw4w9WgXcQ',
-        title: 'Never Gonna Give You Up',
-        channelTitle: 'Rick Astley',
-        thumbnailUrl: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-        isUnavailable: false,
-        unavailableReason: '',
-      },
-      {
-        videoId: 'deleted-id',
-        title: '[Deleted Video]',
-        channelTitle: 'Unknown',
-        thumbnailUrl: '',
-        isUnavailable: true,
-        unavailableReason:
-          'This video is no longer available because the YouTube account associated with this video has been terminated.',
-      },
-    ];
+    this.loading.set(true);
+    this.tracksSignal.set([]);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      this.tracksSignal.set(mockTracks);
-      this.isLoadingSignal.set(false);
-    }, 1500);
+    try {
+      const response = await fetch('/api/playlists/check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ playlistId, apiKey }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to check playlist: ${response.statusText}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('Response body is null');
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // SSE format chunks are separated by double newlines
+        const parts = buffer.split('\n\n');
+        // Keep the last part in the buffer if it's incomplete
+        buffer = parts.pop() || '';
+
+        const newTracks: Track[] = [];
+
+        for (const part of parts) {
+          const lines = part.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const jsonStr = line.replace('data: ', '').trim();
+                const data = JSON.parse(jsonStr);
+
+                // If it looks like a track, add it
+                if (data.videoId || data.VideoId) {
+                  const track: Track = {
+                    videoId: data.videoId || data.VideoId,
+                    title: data.title || data.Title,
+                    channelTitle: data.channelTitle || data.ChannelTitle,
+                    thumbnailUrl: data.thumbnailUrl || data.ThumbnailUrl,
+                    isUnavailable: data.isUnavailable ?? data.IsUnavailable,
+                    unavailableReason: data.unavailableReason || data.UnavailableReason || '',
+                  };
+                  newTracks.push(track);
+                }
+              } catch (e) {
+                console.error('Error parsing track data', e, line);
+              }
+            }
+          }
+        }
+
+        if (newTracks.length > 0) {
+          this.tracksSignal.update((tracks) => [...tracks, ...newTracks]);
+        }
+      }
+    } catch (error) {
+      console.error('Streaming error:', error);
+    } finally {
+      this.loading.set(false);
+    }
   }
 }
