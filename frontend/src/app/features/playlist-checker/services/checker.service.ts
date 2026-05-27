@@ -38,7 +38,7 @@ export class CheckerService {
    * Total number of unavailable tracks found
    */
   unavailableTracksCount = computed(
-    () => this.tracksSignal().filter((track) => track.isUnavailable).length
+    () => this.tracksSignal().filter((track) => track.isUnavailable).length,
   );
 
   /**

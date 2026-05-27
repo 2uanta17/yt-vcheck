@@ -8,15 +8,18 @@
     <mat-card-content>
       <div class="form-row">
         <mat-form-field appearance="outline" class="flex-grow">
-          <mat-label>YouTube Playlist ID</mat-label>
+          <mat-label>YouTube Playlist ID or URL</mat-label>
           <input
             matInput
-            placeholder="e.g. PLBCF29D1063660359"
+            placeholder="Paste Playlist ID or URL here"
             [ngModel]="playlistId()"
-            (ngModelChange)="playlistId.set($event)"
+            (ngModelChange)="playlistId.set($event); idError.set(null)"
             name="playlistId"
             required
           />
+          @if (idError()) {
+            <mat-error>{{ idError() }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="flex-grow">
@@ -50,7 +53,10 @@
                 <span class="chip-label">Total:</span>
                 <strong>{{ checkerService.totalTracks() }}</strong>
               </mat-chip>
-              <mat-chip [color]="checkerService.unavailableTracksCount() > 0 ? 'warn' : ''" [highlighted]="checkerService.unavailableTracksCount() > 0">
+              <mat-chip
+                [color]="checkerService.unavailableTracksCount() > 0 ? 'warn' : ''"
+                [highlighted]="checkerService.unavailableTracksCount() > 0"
+              >
                 <span class="chip-label">Unavailable:</span>
                 <strong>{{ checkerService.unavailableTracksCount() }}</strong>
               </mat-chip>
