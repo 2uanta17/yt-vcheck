@@ -1,8 +1,12 @@
+using backend.Features.Playlists;
+using backend.Infrastructure.YouTube;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<IYouTubeService, YouTubeService>();
 
 var app = builder.Build();
 
@@ -13,6 +17,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapCheckPlaylistStatus();
 
 var summaries = new[]
 {

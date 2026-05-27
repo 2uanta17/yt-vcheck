@@ -4,3 +4,13 @@ GET {{backend_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST {{backend_HostAddress}}/api/playlists/check
+Content-Type: application/json
+
+{
+    "playlistId": "PLTA_O0vB1_ZzF90q2O-fR_vLsk6A7A",
+    "apiKey": "YOUR_API_KEY"
+}
+
+###
