@@ -6,11 +6,17 @@ import { Track } from '../models/track.model';
 })
 export class CheckerService {
   private tracksSignal = signal<Track[]>([]);
+  private isLoadingSignal = signal<boolean>(false);
 
   /**
    * Read-only signal of all tracks
    */
   tracks = this.tracksSignal.asReadonly();
+
+  /**
+   * Read-only signal for loading state
+   */
+  isLoading = this.isLoadingSignal.asReadonly();
 
   /**
    * Filter toggle to show only unavailable tracks
@@ -40,6 +46,7 @@ export class CheckerService {
    */
   checkPlaylist(playlistId: string, apiKey?: string): void {
     console.log(`Checking playlist: ${playlistId}`);
+    this.isLoadingSignal.set(true);
 
     // Placeholder mock data
     const mockTracks: Track[] = [
@@ -65,6 +72,7 @@ export class CheckerService {
     // Simulate API call delay
     setTimeout(() => {
       this.tracksSignal.set(mockTracks);
-    }, 500);
+      this.isLoadingSignal.set(false);
+    }, 1500);
   }
 }

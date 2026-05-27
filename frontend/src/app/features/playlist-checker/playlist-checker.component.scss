@@ -1,0 +1,46 @@
+.dashboard-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  .control-card {
+    overflow: hidden;
+
+    mat-card-header {
+      margin-bottom: 1rem;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      .flex-grow {
+        flex: 1;
+        min-width: 300px;
+      }
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    mat-progress-bar {
+      margin-top: 1rem;
+    }
+  }
+
+  .results-container {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+}

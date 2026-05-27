@@ -1,0 +1,63 @@
+<div class="dashboard-container">
+  <mat-card class="control-card">
+    <mat-card-header>
+      <mat-card-title>YouTube Playlist Checker</mat-card-title>
+      <mat-card-subtitle>Scan playlists for unavailable or deleted videos</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>YouTube Playlist ID</mat-label>
+          <input
+            matInput
+            placeholder="e.g. PLBCF29D1063660359"
+            [ngModel]="playlistId()"
+            (ngModelChange)="playlistId.set($event)"
+            name="playlistId"
+            required
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>API Key (Optional)</mat-label>
+          <input
+            matInput
+            type="password"
+            placeholder="Your YouTube Data API v3 Key"
+            [ngModel]="apiKey()"
+            (ngModelChange)="apiKey.set($event)"
+            name="apiKey"
+          />
+        </mat-form-field>
+      </div>
+
+      <div class="action-row">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="onScan()"
+          [disabled]="!playlistId() || checkerService.isLoading()"
+        >
+          Scan Playlist
+        </button>
+
+        <mat-slide-toggle
+          [checked]="checkerService.showUnavailableOnly()"
+          (change)="onToggleFilter($event.checked)"
+          color="accent"
+        >
+          Show Unavailable Only
+        </mat-slide-toggle>
+      </div>
+    </mat-card-content>
+
+    @if (checkerService.isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+  </mat-card>
+
+  <div class="results-container">
+    <app-track-table [tracks]="checkerService.filteredTracks()"></app-track-table>
+  </div>
+</div>
