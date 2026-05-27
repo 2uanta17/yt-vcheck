@@ -1,5 +1,6 @@
 using backend.Infrastructure.YouTube;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace backend.Features.Playlists;
 
@@ -7,9 +8,11 @@ public static class CheckPlaylistStatus
 {
     public static IEndpointRouteBuilder MapCheckPlaylistStatus(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/playlists/check", (
+        app.MapPost("/api/playlists/check", async (
+            HttpContext context,
             [FromBody] CheckPlaylistRequest request,
-            [FromServices] IYouTubeService youtubeService) =>
+            [FromServices] IYouTubeService youtubeService,
+            CancellationToken ct) =>
         {
             if (string.IsNullOrWhiteSpace(request.PlaylistId))
             {
@@ -21,24 +24,30 @@ public static class CheckPlaylistStatus
                 return Results.BadRequest(ApiResponse<object>.Failure("API Key is required."));
             }
 
+            context.Response.ContentType = "text/event-stream";
+            context.Response.Headers.CacheControl = "no-cache";
+            context.Response.Headers.Connection = "keep-alive";
+
             try
             {
-                // We return the IAsyncEnumerable directly. 
-                // ASP.NET Core handles streaming this as a chunked JSON array.
-                var stream = youtubeService.StreamPlaylistTracksAsync(request.PlaylistId, request.ApiKey);
-                
-                // Note: To return a wrapped stream while still streaming, 
-                // we'd need a more complex setup. For now, we return the stream 
-                // directly as per modern Minimal API standards for IAsyncEnumerable.
-                return Results.Ok(stream);
+                await foreach (var track in youtubeService.StreamPlaylistTracksAsync(request.PlaylistId, request.ApiKey, ct))
+                {
+                    var json = JsonSerializer.Serialize(track);
+                    await context.Response.WriteAsync($"data: {json}\n\n", ct);
+                    await context.Response.Body.FlushAsync(ct);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Client disconnected
             }
             catch (Exception ex)
             {
-                return Results.Json(
-                    ApiResponse<object>.Failure($"An error occurred: {ex.Message}"), 
-                    statusCode: StatusCodes.Status500InternalServerError
-                );
+                var errorJson = JsonSerializer.Serialize(ApiResponse<object>.Failure($"An error occurred: {ex.Message}"));
+                await context.Response.WriteAsync($"event: error\ndata: {errorJson}\n\n", ct);
             }
+
+            return Results.Empty;
         })
         .WithName("CheckPlaylistStatus")
         .WithOpenApi();

@@ -8,9 +8,10 @@ namespace backend.Infrastructure.YouTube;
 
 public class YouTubeService : IYouTubeService
 {
-    public async IAsyncEnumerable<List<YoutubeTrackDto>> StreamPlaylistTracksAsync(
+    public async IAsyncEnumerable<YoutubeTrackDto> StreamPlaylistTracksAsync(
         string playlistId, 
-        string apiKey)
+        string apiKey,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var service = new Google.Apis.YouTube.v3.YouTubeService(new BaseClientService.Initializer
         {
@@ -30,11 +31,15 @@ public class YouTubeService : IYouTubeService
             PlaylistItemListResponse playlistResponse;
             try
             {
-                playlistResponse = await playlistRequest.ExecuteAsync();
+                playlistResponse = await playlistRequest.ExecuteAsync(cancellationToken);
             }
             catch (Google.GoogleApiException ex) when (ex.Error.Code == 404 || ex.Error.Code == 403)
             {
                 // Playlist not found or private
+                yield break;
+            }
+            catch (OperationCanceledException)
+            {
                 yield break;
             }
             catch (Exception)
@@ -54,10 +59,8 @@ public class YouTubeService : IYouTubeService
             var videoRequest = service.Videos.List("status,contentDetails,snippet");
             videoRequest.Id = string.Join(",", videoIds);
             
-            var videoResponse = await videoRequest.ExecuteAsync();
+            var videoResponse = await videoRequest.ExecuteAsync(cancellationToken);
             var videoMap = videoResponse.Items.ToDictionary(v => v.Id);
-
-            var batch = new List<YoutubeTrackDto>();
 
             foreach (var item in playlistResponse.Items)
             {
@@ -93,17 +96,16 @@ public class YouTubeService : IYouTubeService
                     }
                 }
 
-                batch.Add(new YoutubeTrackDto(
+                yield return new YoutubeTrackDto(
                     VideoId: videoId,
                     Title: item.Snippet.Title ?? "Unknown Title",
                     ChannelTitle: item.Snippet.VideoOwnerChannelTitle ?? item.Snippet.ChannelTitle ?? "Unknown Channel",
                     ThumbnailUrl: item.Snippet.Thumbnails?.Maxres?.Url ?? item.Snippet.Thumbnails?.Medium?.Url ?? item.Snippet.Thumbnails?.Default__?.Url ?? "",
                     IsUnavailable: isUnavailable,
                     UnavailableReason: reason
-                ));
+                );
             }
 
-            yield return batch;
             nextPageToken = playlistResponse.NextPageToken;
 
         } while (!string.IsNullOrEmpty(nextPageToken));
