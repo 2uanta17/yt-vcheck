@@ -33,10 +33,17 @@ public class YouTubeService : IYouTubeService
             {
                 playlistResponse = await playlistRequest.ExecuteAsync(cancellationToken);
             }
-            catch (Google.GoogleApiException ex) when (ex.Error.Code == 404 || ex.Error.Code == 403)
+            catch (Google.GoogleApiException ex)
             {
-                // Playlist not found or private
-                yield break;
+                if (ex.Error.Code == 404)
+                {
+                    throw new Exception("Playlist not found. Please check the ID.");
+                }
+                if (ex.Error.Code == 403)
+                {
+                    throw new Exception("Access denied. The playlist might be private or the API key is invalid.");
+                }
+                throw new Exception($"YouTube API error: {ex.Error.Message}");
             }
             catch (OperationCanceledException)
             {
@@ -53,6 +60,7 @@ public class YouTubeService : IYouTubeService
 
             var videoIds = playlistResponse.Items
                 .Select(i => i.ContentDetails.VideoId)
+                .Where(id => !string.IsNullOrEmpty(id))
                 .ToList();
 
             // Fetch explicit status and content details for these videos
@@ -60,7 +68,7 @@ public class YouTubeService : IYouTubeService
             videoRequest.Id = string.Join(",", videoIds);
             
             var videoResponse = await videoRequest.ExecuteAsync(cancellationToken);
-            var videoMap = videoResponse.Items.ToDictionary(v => v.Id);
+            var videoMap = (videoResponse.Items ?? new List<Video>()).ToDictionary(v => v.Id);
 
             foreach (var item in playlistResponse.Items)
             {

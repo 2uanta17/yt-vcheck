@@ -7,6 +7,7 @@ import { Track } from '../models/track.model';
 export class CheckerService {
   private tracksSignal = signal<Track[]>([]);
   private loading = signal<boolean>(false);
+  private error = signal<string | null>(null);
 
   /**
    * Read-only signal of all tracks
@@ -17,6 +18,11 @@ export class CheckerService {
    * Read-only signal for loading state
    */
   isLoading = this.loading.asReadonly();
+
+  /**
+   * Read-only signal for error messages
+   */
+  errorMessage = this.error.asReadonly();
 
   /**
    * Filter toggle to show only unavailable tracks
@@ -48,6 +54,7 @@ export class CheckerService {
     if (!playlistId) return;
 
     this.loading.set(true);
+    this.error.set(null);
     this.tracksSignal.set([]);
 
     try {
@@ -60,7 +67,8 @@ export class CheckerService {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to check playlist: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to check playlist: ${response.statusText}`);
       }
 
       const reader = response.body?.getReader();
@@ -86,11 +94,20 @@ export class CheckerService {
 
         for (const part of parts) {
           const lines = part.split('\n');
+          let currentEvent = 'message';
+
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
+            if (line.startsWith('event: ')) {
+              currentEvent = line.replace('event: ', '').trim();
+            } else if (line.startsWith('data: ')) {
               try {
                 const jsonStr = line.replace('data: ', '').trim();
                 const data = JSON.parse(jsonStr);
+
+                if (currentEvent === 'error') {
+                  this.error.set(data.Error || data.error || 'An unknown error occurred');
+                  continue;
+                }
 
                 // If it looks like a track, add it
                 if (data.videoId || data.VideoId) {
@@ -115,8 +132,9 @@ export class CheckerService {
           this.tracksSignal.update((tracks) => [...tracks, ...newTracks]);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Streaming error:', error);
+      this.error.set(error.message || 'An error occurred while scanning the playlist.');
     } finally {
       this.loading.set(false);
     }

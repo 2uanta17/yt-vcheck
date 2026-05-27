@@ -49,9 +49,28 @@
 
         <!-- Actions Column -->
         <div class="mat-mdc-cell mat-column-actions">
-          <button mat-icon-button color="primary" aria-label="Action placeholder">
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="menu"
+            color="primary"
+            aria-label="Track actions"
+          >
             <mat-icon>more_vert</mat-icon>
           </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="copyVideoId(track.videoId)">
+              <mat-icon>content_copy</mat-icon>
+              <span>Copy Video ID</span>
+            </button>
+            <button mat-menu-item (click)="searchYouTube(track)">
+              <mat-icon>open_in_new</mat-icon>
+              <span>Search on YouTube</span>
+            </button>
+            <button mat-menu-item (click)="searchGoogle(track)">
+              <mat-icon>search</mat-icon>
+              <span>Search on Google</span>
+            </button>
+          </mat-menu>
         </div>
       </div>
 

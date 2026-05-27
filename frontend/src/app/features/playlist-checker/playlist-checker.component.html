@@ -20,7 +20,7 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="flex-grow">
-          <mat-label>API Key (Optional)</mat-label>
+          <mat-label>API Key</mat-label>
           <input
             matInput
             type="password"
@@ -28,6 +28,7 @@
             [ngModel]="apiKey()"
             (ngModelChange)="apiKey.set($event)"
             name="apiKey"
+            required
           />
         </mat-form-field>
       </div>
@@ -37,7 +38,7 @@
           mat-raised-button
           color="primary"
           (click)="onScan()"
-          [disabled]="!playlistId() || checkerService.isLoading()"
+          [disabled]="!playlistId() || !apiKey() || checkerService.isLoading()"
         >
           Scan Playlist
         </button>
@@ -56,6 +57,19 @@
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
   </mat-card>
+
+  @if (checkerService.errorMessage(); as error) {
+    <div class="error-container">
+      <mat-card class="error-card">
+        <mat-card-content>
+          <div class="error-content">
+            <mat-icon color="warn">error</mat-icon>
+            <span>{{ error }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
 
   <div class="results-container">
     <app-track-table [tracks]="checkerService.filteredTracks()"></app-track-table>

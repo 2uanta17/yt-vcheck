@@ -21,7 +21,7 @@ public static class CheckPlaylistStatus
 
             if (string.IsNullOrWhiteSpace(request.ApiKey))
             {
-                return Results.BadRequest(ApiResponse<object>.Failure("API Key is required."));
+                return Results.BadRequest(new { error = "API Key is required. Please provide a valid YouTube Data API v3 key." });
             }
 
             context.Response.ContentType = "text/event-stream";
