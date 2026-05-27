@@ -1,26 +1,36 @@
 .dashboard-container {
-  padding: 1.5rem;
-  max-width: 1200px;
+  padding: 3rem 2rem;
+  max-width: 1100px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 
   .control-card {
-    overflow: hidden;
+    border-radius: 28px; // M3 extra large
+    padding: 8px;
 
     mat-card-header {
-      margin-bottom: 1rem;
+      margin-bottom: 24px;
+
+      mat-card-title {
+        font: var(--mat-sys-headline-small);
+        font-weight: 600;
+      }
+      mat-card-subtitle {
+        font: var(--mat-sys-body-medium);
+        opacity: 0.7;
+      }
     }
 
     .form-row {
       display: flex;
-      gap: 1rem;
+      gap: 16px;
       flex-wrap: wrap;
 
       .flex-grow {
         flex: 1;
-        min-width: 300px;
+        min-width: 280px;
       }
     }
 
@@ -28,54 +38,72 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 0.5rem;
+      margin-top: 16px;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 16px;
+
+      button[mat-flat-button] {
+        height: 48px;
+        padding: 0 24px;
+        gap: 8px;
+        font-weight: 500;
+      }
 
       .stats-toggle-group {
         display: flex;
         align-items: center;
-        gap: 1.5rem;
+        gap: 24px;
         flex-wrap: wrap;
 
         .stats-chips {
           .chip-label {
             margin-right: 4px;
             font-size: 0.85rem;
-            opacity: 0.8;
           }
 
           mat-chip {
             --mdc-chip-label-text-size: 0.85rem;
             min-height: 32px;
+            background-color: var(--mat-sys-secondary-container);
+            color: var(--mat-sys-on-secondary-container);
+            border: none;
+
+            &.unavailable-chip.has-unavailable {
+              background-color: var(--mat-sys-error-container);
+              color: var(--mat-sys-on-error-container);
+            }
           }
         }
       }
     }
 
     mat-progress-bar {
-      margin-top: 1rem;
+      margin-top: 24px;
+      border-radius: 4px;
     }
   }
 
   .error-container {
     .error-card {
-      border: 1px solid var(--mat-sys-error-container);
+      border-radius: 16px;
       background-color: var(--mat-sys-error-container);
       color: var(--mat-sys-on-error-container);
 
       .error-content {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 12px;
         font-weight: 500;
+
+        mat-icon {
+          color: var(--mat-sys-error);
+        }
       }
     }
   }
 
   .results-container {
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 28px;
+    overflow: hidden;
   }
 }

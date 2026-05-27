@@ -5,7 +5,6 @@ import { Component, inject, input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
 import { Track } from '../../models/track.model';
 
@@ -20,7 +19,6 @@ import { Track } from '../../models/track.model';
     MatChipsModule,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule,
     ScrollingModule,
   ],
 })
