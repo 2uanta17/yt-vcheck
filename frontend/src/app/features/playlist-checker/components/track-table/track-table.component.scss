@@ -130,15 +130,43 @@
 
 .action-buttons {
   display: flex;
+  align-items: center;
   gap: 4px;
   opacity: 0.6; // Subtle by default like YT
   transition: opacity 0.2s;
 
   button[mat-icon-button] {
     --mdc-icon-button-icon-size: 20px;
-    width: 36px;
-    height: 36px;
-    padding: 8px;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+
+    &:hover {
+      background-color: var(
+        --mat-sys-on-surface-variant-opacity-08,
+        rgba(0, 0, 0, 0.08)
+      ) !important;
+    }
+
+    ::ng-deep .mat-mdc-button-touch-target {
+      display: none; // Remove 48px touch target that shifts centering
+    }
+
+    mat-icon {
+      margin: 0 !important;
+      width: 20px !important;
+      height: 20px !important;
+      font-size: 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 20px !important;
+    }
   }
 }
 
