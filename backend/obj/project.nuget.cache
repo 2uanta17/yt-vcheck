@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "dgSpecHash": "tk9LLdhG9Wg=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Rina Tennoji\\Desktop\\PROJECTS\\yt-vcheck\\backend\\backend.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\google.apis\\1.74.0\\google.apis.1.74.0.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\google.apis.auth\\1.74.0\\google.apis.auth.1.74.0.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\google.apis.core\\1.74.0\\google.apis.core.1.74.0.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\google.apis.youtube.v3\\1.74.0.4137\\google.apis.youtube.v3.1.74.0.4137.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.11\\microsoft.aspnetcore.openapi.9.0.11.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\newtonsoft.json\\13.0.4\\newtonsoft.json.13.0.4.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\system.codedom\\7.0.0\\system.codedom.7.0.0.nupkg.sha512",
+    "C:\\Users\\Rina Tennoji\\.nuget\\packages\\system.management\\7.0.2\\system.management.7.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
