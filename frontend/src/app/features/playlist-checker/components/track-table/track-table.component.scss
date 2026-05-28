@@ -41,7 +41,8 @@
     min-height: 100px;
     background-color: transparent;
     border-bottom: 1px solid transparent;
-    transition: background-color 0.1s ease;
+    border-radius: 12px;
+    transition: background-color 0.2s ease;
 
     @media (max-width: 768px) {
       flex-direction: column;
@@ -50,15 +51,11 @@
       min-height: auto;
       gap: 12px;
       border-bottom: 1px solid var(--mat-sys-outline-variant);
+      border-radius: 0;
     }
 
     &:hover {
-      background-color: var(--mat-sys-surface-container-low);
-      border-radius: 12px;
-
-      @media (max-width: 768px) {
-        border-radius: 0;
-      }
+      background-color: var(--mat-sys-surface-container-high);
 
       .action-buttons {
         opacity: 1;

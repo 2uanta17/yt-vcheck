@@ -39,6 +39,7 @@
       <div class="action-row">
         <button
           mat-flat-button
+          color="primary"
           (click)="onScan()"
           [disabled]="!playlistId() || !apiKey() || checkerService.isLoading()"
         >

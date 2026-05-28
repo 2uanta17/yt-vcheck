@@ -12,11 +12,13 @@
   }
 
   .control-card {
-    border-radius: 28px; // M3 extra large
+    border-radius: 12px;
     padding: 8px;
+    background-color: var(--mat-sys-surface-container);
+    border: none;
 
     @media (max-width: 600px) {
-      border-radius: 16px;
+      border-radius: 0;
       padding: 4px;
     }
 
