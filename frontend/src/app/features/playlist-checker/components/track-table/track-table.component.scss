@@ -2,6 +2,10 @@
   border-radius: 12px;
   overflow: hidden;
   background-color: transparent;
+
+  @media (max-width: 768px) {
+    border-radius: 0;
+  }
 }
 
 .youtube-list {
@@ -16,6 +20,10 @@
     min-height: 48px;
     background-color: transparent;
     border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+    @media (max-width: 768px) {
+      display: none; // Hide headers on small screens to save space
+    }
 
     .mat-mdc-header-cell {
       font-size: 12px;
@@ -35,9 +43,22 @@
     border-bottom: 1px solid transparent;
     transition: background-color 0.1s ease;
 
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px;
+      min-height: auto;
+      gap: 12px;
+      border-bottom: 1px solid var(--mat-sys-outline-variant);
+    }
+
     &:hover {
       background-color: var(--mat-sys-surface-container-low);
       border-radius: 12px;
+
+      @media (max-width: 768px) {
+        border-radius: 0;
+      }
 
       .action-buttons {
         opacity: 1;
@@ -50,6 +71,12 @@
     display: flex;
     align-items: center;
     padding: 8px;
+
+    @media (max-width: 768px) {
+      padding: 0;
+      width: 100% !important;
+      flex: none !important;
+    }
   }
 }
 
@@ -58,6 +85,10 @@
   min-height: 400px;
   width: 100%;
   outline: none;
+
+  @media (max-width: 768px) {
+    height: calc(100vh - 450px);
+  }
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -80,6 +111,10 @@
   font-weight: 400;
   width: 24px;
   text-align: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .track-thumbnail {
@@ -87,6 +122,11 @@
   aspect-ratio: 16/9;
   object-fit: cover;
   border-radius: 8px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 320px;
+  }
 }
 
 .details-container {
@@ -103,6 +143,10 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 20px;
+
+    @media (max-width: 768px) {
+      -webkit-line-clamp: 3;
+    }
   }
 
   .channel-title {
@@ -116,6 +160,10 @@
   min-height: 24px !important;
   font-size: 11px;
   font-weight: 600;
+
+  @media (max-width: 768px) {
+    width: fit-content;
+  }
 
   &.available {
     --mdc-chip-elevated-container-color: rgba(46, 125, 50, 0.1);
@@ -134,6 +182,12 @@
   gap: 4px;
   opacity: 0.6; // Subtle by default like YT
   transition: opacity 0.2s;
+
+  @media (max-width: 768px) {
+    opacity: 1;
+    width: 100%;
+    justify-content: flex-end;
+  }
 
   button[mat-icon-button] {
     --mdc-icon-button-icon-size: 20px;

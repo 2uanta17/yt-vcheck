@@ -6,16 +6,34 @@
   flex-direction: column;
   gap: 1.5rem;
 
+  @media (max-width: 600px) {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
   .control-card {
     border-radius: 28px; // M3 extra large
     padding: 8px;
 
+    @media (max-width: 600px) {
+      border-radius: 16px;
+      padding: 4px;
+    }
+
     mat-card-header {
       margin-bottom: 24px;
+
+      @media (max-width: 600px) {
+        margin-bottom: 16px;
+      }
 
       mat-card-title {
         font: var(--mat-sys-headline-small);
         font-weight: 600;
+
+        @media (max-width: 600px) {
+          font-size: 1.25rem;
+        }
       }
       mat-card-subtitle {
         font: var(--mat-sys-body-medium);
@@ -31,6 +49,10 @@
       .flex-grow {
         flex: 1;
         min-width: 280px;
+
+        @media (max-width: 600px) {
+          min-width: 100%;
+        }
       }
     }
 
@@ -42,6 +64,11 @@
       flex-wrap: wrap;
       gap: 16px;
 
+      @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
       button[mat-flat-button] {
         height: 36px;
         padding: 0 16px;
@@ -49,6 +76,11 @@
         font-size: 14px;
         font-weight: 500;
         border-radius: 18px;
+
+        @media (max-width: 600px) {
+          width: 100%;
+          height: 44px; // Slightly larger for better mobile tap target
+        }
 
         mat-icon {
           width: 18px;
@@ -65,11 +97,19 @@
         gap: 16px;
         flex-wrap: wrap;
 
+        @media (max-width: 600px) {
+          justify-content: space-between;
+        }
+
         mat-slide-toggle {
           transform: scale(0.9);
           transform-origin: left center;
           font-size: 13px;
           font-weight: 500;
+
+          ::ng-deep .mdc-label {
+            padding-left: 8px;
+          }
         }
 
         .stats-chips {
