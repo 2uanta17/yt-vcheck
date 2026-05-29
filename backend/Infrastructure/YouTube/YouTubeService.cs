@@ -19,8 +19,12 @@ public class YouTubeService : IYouTubeService
     public async IAsyncEnumerable<YoutubeTrackDto> StreamPlaylistTracksAsync(
         string playlistId, 
         string apiKey,
+        string? countryCode = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        // Default to US if not provided
+        countryCode = countryCode?.ToUpperInvariant() ?? "US";
+
         using var service = new Google.Apis.YouTube.v3.YouTubeService(new BaseClientService.Initializer
         {
             ApiKey = apiKey,
@@ -104,9 +108,7 @@ public class YouTubeService : IYouTubeService
                         isUnavailable = true;
                         reason = "Deleted";
                     }
-                    else if (videoDetails.ContentDetails.RegionRestriction != null && 
-                             videoDetails.ContentDetails.RegionRestriction.Blocked != null && 
-                             videoDetails.ContentDetails.RegionRestriction.Blocked.Any())
+                    else if (IsRegionLocked(videoDetails.ContentDetails.RegionRestriction, countryCode))
                     {
                         isUnavailable = true;
                         reason = "Region Locked";
@@ -126,5 +128,24 @@ public class YouTubeService : IYouTubeService
             nextPageToken = playlistResponse.NextPageToken;
 
         } while (!string.IsNullOrEmpty(nextPageToken));
+    }
+
+    private static bool IsRegionLocked(VideoContentDetailsRegionRestriction? restriction, string countryCode)
+    {
+        if (restriction == null) return false;
+
+        // If Allowed is populated, target must be in it
+        if (restriction.Allowed != null && restriction.Allowed.Any())
+        {
+            return !restriction.Allowed.Contains(countryCode, StringComparer.OrdinalIgnoreCase);
+        }
+
+        // If Blocked is populated, target must NOT be in it
+        if (restriction.Blocked != null && restriction.Blocked.Any())
+        {
+            return restriction.Blocked.Contains(countryCode, StringComparer.OrdinalIgnoreCase);
+        }
+
+        return false;
     }
 }

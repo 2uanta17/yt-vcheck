@@ -31,9 +31,16 @@ public static class CheckPlaylistStatus
             context.Response.Headers.CacheControl = "no-cache";
             context.Response.Headers.Connection = "keep-alive";
 
+            // Determine country code: Priority: 1. Body param, 2. X-Country-Code header, 3. Default (US)
+            string? countryCode = request.CountryCode;
+            if (string.IsNullOrWhiteSpace(countryCode) && context.Request.Headers.TryGetValue("X-Country-Code", out var headerValue))
+            {
+                countryCode = headerValue.ToString();
+            }
+
             try
             {
-                await foreach (var track in youtubeService.StreamPlaylistTracksAsync(request.PlaylistId, request.ApiKey, ct))
+                await foreach (var track in youtubeService.StreamPlaylistTracksAsync(request.PlaylistId, request.ApiKey, countryCode, ct))
                 {
                     var json = JsonSerializer.Serialize(track);
                     await context.Response.WriteAsync($"data: {json}\n\n", ct);
@@ -60,7 +67,7 @@ public static class CheckPlaylistStatus
     }
 }
 
-public record CheckPlaylistRequest(string PlaylistId, string ApiKey);
+public record CheckPlaylistRequest(string PlaylistId, string ApiKey, string? CountryCode = null);
 
 public record ApiResponse<T>(T? Data, string? Error, bool Success)
 {
