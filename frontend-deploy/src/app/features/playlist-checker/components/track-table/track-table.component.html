@@ -1,0 +1,95 @@
+<div class="table-container">
+  <div class="mat-mdc-table youtube-list">
+    <!-- Header Row -->
+    <div class="mat-mdc-header-row">
+      <div class="mat-mdc-header-cell mat-column-index">#</div>
+      <div class="mat-mdc-header-cell mat-column-thumbnail">Thumbnail</div>
+      <div class="mat-mdc-header-cell mat-column-details">Track Details</div>
+      <div class="mat-mdc-header-cell mat-column-status">Status</div>
+      <div class="mat-mdc-header-cell mat-column-actions">Actions</div>
+    </div>
+
+    <!-- Virtual Scroll Viewport -->
+    <cdk-virtual-scroll-viewport
+      itemSize="110"
+      class="track-viewport"
+      [minBufferPx]="440"
+      [maxBufferPx]="880"
+    >
+      <div *cdkVirtualFor="let track of tracks(); let i = index" class="mat-mdc-row">
+        <!-- Index Column -->
+        <div class="mat-mdc-cell mat-column-index">
+          <span class="index-number">{{ i + 1 }}</span>
+        </div>
+
+        <!-- Thumbnail Column -->
+        <div class="mat-mdc-cell mat-column-thumbnail">
+          <img
+            [src]="track.thumbnailUrl"
+            [alt]="track.title"
+            class="track-thumbnail"
+            loading="lazy"
+          />
+        </div>
+
+        <!-- Details Column -->
+        <div class="mat-mdc-cell mat-column-details">
+          <div class="details-container">
+            <span class="track-title" [title]="track.title">{{ track.title }}</span>
+            <span class="channel-title">{{ track.channelTitle }}</span>
+          </div>
+        </div>
+
+        <!-- Status Column -->
+        <div class="mat-mdc-cell mat-column-status">
+          <mat-chip-set>
+            @if (track.isUnavailable) {
+              @if (track.isSafeToRemove) {
+                <mat-chip-row highlighted class="status-chip duplicate-warning">
+                  {{ track.statusDetails }}
+                </mat-chip-row>
+              } @else {
+                <mat-chip-row highlighted class="status-chip unavailable">
+                  {{ track.unavailableReason }}
+                </mat-chip-row>
+              }
+            } @else {
+              <mat-chip-row class="status-chip available"> Available </mat-chip-row>
+            }
+          </mat-chip-set>
+        </div>
+
+        <!-- Actions Column -->
+        <div class="mat-mdc-cell mat-column-actions">
+          <div class="action-buttons">
+            <button
+              mat-icon-button
+              (click)="viewInPlaylist(track)"
+              title="View in Playlist"
+              [disabled]="!playlistId()"
+            >
+              <mat-icon>playlist_play</mat-icon>
+            </button>
+            <button mat-icon-button (click)="copyVideoId(track.videoId)" title="Copy Video ID">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button (click)="searchYouTube(track)" title="Search on YouTube">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+            <button mat-icon-button (click)="searchGoogle(track)" title="Search on Google">
+              <mat-icon>search</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      @if (tracks().length === 0) {
+        <div class="no-data-cell">
+          <mat-icon>search_off</mat-icon>
+          <p>No tracks found matching your criteria.</p>
+        </div>
+      }
+    </cdk-virtual-scroll-viewport>
+  </div>
+</div>

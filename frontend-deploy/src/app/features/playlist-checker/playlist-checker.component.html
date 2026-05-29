@@ -1,0 +1,129 @@
+<div class="dashboard-container">
+  <mat-card class="control-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>YouTube Playlist Checker</mat-card-title>
+      <mat-card-subtitle>Scan playlists for unavailable or deleted videos</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>YouTube Playlist ID or URL</mat-label>
+          <input
+            matInput
+            placeholder="Paste Playlist ID or URL here"
+            [ngModel]="playlistId()"
+            (ngModelChange)="playlistId.set($event); idError.set(null)"
+            name="playlistId"
+            required
+          />
+          @if (idError()) {
+            <mat-error>{{ idError() }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-grow">
+          <input
+            matInput
+            type="password"
+            placeholder="Your YouTube Data API v3 Key"
+            [ngModel]="apiKey()"
+            (ngModelChange)="apiKey.set($event)"
+            name="apiKey"
+            required
+          />
+          <mat-label>API Key</mat-label>
+        </mat-form-field>
+      </div>
+
+      <div class="action-row">
+        <div class="left-actions">
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="onScan()"
+            [disabled]="!playlistId() || !apiKey() || checkerService.isLoading()"
+          >
+            <mat-icon>search</mat-icon>
+            Scan Playlist
+          </button>
+
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search tracks...</mat-label>
+            <input
+              matInput
+              [ngModel]="checkerService.searchTerm()"
+              (ngModelChange)="checkerService.searchTerm.set($event)"
+              placeholder="Title or channel"
+            />
+          </mat-form-field>
+        </div>
+
+        <div class="stats-toggle-group">
+          @if (checkerService.totalTracks() > 0) {
+            <mat-chip-set class="stats-chips">
+              <mat-chip>
+                <span class="chip-label">Total:</span>
+                <strong>{{ checkerService.totalTracks() }}</strong>
+              </mat-chip>
+              <mat-chip
+                class="unavailable-chip"
+                [class.has-unavailable]="checkerService.unavailableTracksCount() > 0"
+              >
+                <span class="chip-label">Unavailable:</span>
+                <strong>{{ checkerService.unavailableTracksCount() }}</strong>
+              </mat-chip>
+
+              @if (checkerService.duplicateTracksCount() > 0) {
+                <mat-chip class="duplicate-chip has-duplicates">
+                  <span class="chip-label">Duplicates:</span>
+                  <strong>{{ checkerService.duplicateTracksCount() }}</strong>
+                </mat-chip>
+              }
+            </mat-chip-set>
+          }
+
+          <div class="toggles">
+            <mat-slide-toggle
+              [checked]="checkerService.showUnavailableOnly()"
+              (change)="onToggleFilter($event.checked)"
+            >
+              Show Unavailable
+            </mat-slide-toggle>
+
+            <mat-slide-toggle
+              [checked]="checkerService.showDuplicatesOnly()"
+              (change)="onToggleDuplicates($event.checked)"
+            >
+              Show Duplicates
+            </mat-slide-toggle>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+
+    @if (checkerService.isLoading()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+  </mat-card>
+
+  @if (checkerService.errorMessage(); as error) {
+    <div class="error-container">
+      <mat-card class="error-card" appearance="outlined">
+        <mat-card-content>
+          <div class="error-content">
+            <mat-icon>error</mat-icon>
+            <span>{{ error }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  <div class="results-container">
+    <app-track-table
+      [tracks]="checkerService.filteredTracks()"
+      [playlistId]="checkerService.currentPlaylistId()"
+    ></app-track-table>
+  </div>
+</div>
