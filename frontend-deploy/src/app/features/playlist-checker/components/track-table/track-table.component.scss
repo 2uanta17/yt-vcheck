@@ -122,7 +122,8 @@
 
   @media (max-width: 768px) {
     width: 100%;
-    max-width: 320px;
+    max-width: 500px;
+    margin: 0 auto;
   }
 }
 
@@ -249,6 +250,9 @@
 
 .mat-column-thumbnail {
   flex: 0 0 180px;
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
 }
 
 .mat-column-details {
