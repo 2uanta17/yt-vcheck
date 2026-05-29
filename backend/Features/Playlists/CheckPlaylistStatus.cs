@@ -13,9 +13,10 @@ public static class CheckPlaylistStatus
             HttpContext context,
             [FromBody] CheckPlaylistRequest request,
             [FromServices] IYouTubeService youtubeService,
-            [FromServices] ILogger<CheckPlaylistStatus> logger,
+            [FromServices] ILoggerFactory loggerFactory,
             CancellationToken ct) =>
         {
+            var logger = loggerFactory.CreateLogger("CheckPlaylistStatus");
             if (string.IsNullOrWhiteSpace(request.PlaylistId))
             {
                 return Results.BadRequest(ApiResponse<object>.Failure("Playlist ID is required."));

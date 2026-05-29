@@ -6,5 +6,7 @@ public record YoutubeTrackDto(
     string ChannelTitle,
     string ThumbnailUrl,
     bool IsUnavailable,
-    string? UnavailableReason
+    string? UnavailableReason,
+    string? StatusDetails = null,
+    bool IsSafeToRemove = false
 );

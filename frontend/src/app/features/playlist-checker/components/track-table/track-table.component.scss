@@ -171,6 +171,11 @@
     --mdc-chip-elevated-container-color: rgba(211, 47, 47, 0.1);
     --mdc-chip-label-text-color: #d32f2f;
   }
+
+  &.duplicate-warning {
+    --mdc-chip-elevated-container-color: rgba(237, 108, 2, 0.1);
+    --mdc-chip-label-text-color: #ed6c02;
+  }
 }
 
 .action-buttons {

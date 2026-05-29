@@ -37,15 +37,27 @@
       </div>
 
       <div class="action-row">
-        <button
-          mat-flat-button
-          color="primary"
-          (click)="onScan()"
-          [disabled]="!playlistId() || !apiKey() || checkerService.isLoading()"
-        >
-          <mat-icon>search</mat-icon>
-          Scan Playlist
-        </button>
+        <div class="left-actions">
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="onScan()"
+            [disabled]="!playlistId() || !apiKey() || checkerService.isLoading()"
+          >
+            <mat-icon>search</mat-icon>
+            Scan Playlist
+          </button>
+
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search tracks...</mat-label>
+            <input
+              matInput
+              [ngModel]="checkerService.searchTerm()"
+              (ngModelChange)="checkerService.searchTerm.set($event)"
+              placeholder="Title or channel"
+            />
+          </mat-form-field>
+        </div>
 
         <div class="stats-toggle-group">
           @if (checkerService.totalTracks() > 0) {
@@ -61,15 +73,31 @@
                 <span class="chip-label">Unavailable:</span>
                 <strong>{{ checkerService.unavailableTracksCount() }}</strong>
               </mat-chip>
+
+              @if (checkerService.duplicateTracksCount() > 0) {
+                <mat-chip class="duplicate-chip has-duplicates">
+                  <span class="chip-label">Duplicates:</span>
+                  <strong>{{ checkerService.duplicateTracksCount() }}</strong>
+                </mat-chip>
+              }
             </mat-chip-set>
           }
 
-          <mat-slide-toggle
-            [checked]="checkerService.showUnavailableOnly()"
-            (change)="onToggleFilter($event.checked)"
-          >
-            Show Unavailable Only
-          </mat-slide-toggle>
+          <div class="toggles">
+            <mat-slide-toggle
+              [checked]="checkerService.showUnavailableOnly()"
+              (change)="onToggleFilter($event.checked)"
+            >
+              Show Unavailable
+            </mat-slide-toggle>
+
+            <mat-slide-toggle
+              [checked]="checkerService.showDuplicatesOnly()"
+              (change)="onToggleDuplicates($event.checked)"
+            >
+              Show Duplicates
+            </mat-slide-toggle>
+          </div>
         </div>
       </div>
     </mat-card-content>
@@ -93,6 +121,9 @@
   }
 
   <div class="results-container">
-    <app-track-table [tracks]="checkerService.filteredTracks()"></app-track-table>
+    <app-track-table
+      [tracks]="checkerService.filteredTracks()"
+      [playlistId]="checkerService.currentPlaylistId()"
+    ></app-track-table>
   </div>
 </div>

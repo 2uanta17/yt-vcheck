@@ -5,4 +5,6 @@ export interface Track {
   thumbnailUrl: string;
   isUnavailable: boolean;
   unavailableReason: string;
+  statusDetails?: string;
+  isSafeToRemove?: boolean;
 }

@@ -71,25 +71,50 @@
         align-items: stretch;
       }
 
-      button[mat-flat-button] {
-        height: 36px;
-        padding: 0 16px;
-        gap: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        border-radius: 18px;
+      .left-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
 
         @media (max-width: 600px) {
           width: 100%;
-          height: 44px; // Slightly larger for better mobile tap target
         }
 
-        mat-icon {
-          width: 18px;
-          height: 18px;
-          font-size: 18px;
-          margin-left: 0;
-          margin-right: 0;
+        button[mat-flat-button] {
+          height: 36px;
+          padding: 0 20px;
+          gap: 8px;
+          font-size: 14px;
+          font-weight: 500;
+          border-radius: 18px;
+
+          @media (max-width: 600px) {
+            width: 100%;
+            height: 44px;
+          }
+
+          mat-icon {
+            width: 18px;
+            height: 18px;
+            font-size: 18px;
+            margin-left: 0;
+            margin-right: 0;
+          }
+        }
+
+        .search-field {
+          width: 450px;
+
+          @media (max-width: 600px) {
+            width: 100%;
+          }
+
+          ::ng-deep {
+            .mat-mdc-form-field-subscript-wrapper {
+              display: none;
+            }
+          }
         }
       }
 
@@ -98,9 +123,17 @@
         align-items: center;
         gap: 16px;
         flex-wrap: wrap;
+        justify-content: flex-end;
+        flex-grow: 1;
 
         @media (max-width: 600px) {
           justify-content: space-between;
+          width: 100%;
+        }
+
+        .toggles {
+          display: flex;
+          align-items: center;
         }
 
         mat-slide-toggle {
@@ -138,6 +171,11 @@
             &.unavailable-chip.has-unavailable {
               background-color: rgba(211, 47, 47, 0.1);
               color: #d32f2f;
+            }
+
+            &.duplicate-chip.has-duplicates {
+              background-color: rgba(237, 108, 2, 0.1);
+              color: #ed6c02;
             }
           }
         }

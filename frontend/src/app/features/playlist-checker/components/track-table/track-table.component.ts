@@ -26,10 +26,22 @@ export class TrackTableComponent {
   private clipboard = inject(Clipboard);
 
   tracks = input.required<Track[]>();
+  playlistId = input<string | null>(null);
   displayedColumns: string[] = ['thumbnail', 'details', 'status', 'actions'];
 
   copyVideoId(videoId: string): void {
     this.clipboard.copy(videoId);
+  }
+
+  viewInPlaylist(track: Track): void {
+    const pId = this.playlistId();
+    if (!pId) return;
+
+    window.open(
+      `https://www.youtube.com/watch?v=${track.videoId}&list=${pId}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
   }
 
   searchYouTube(track: Track): void {

@@ -90,5 +90,18 @@ export class PlaylistCheckerComponent {
    */
   onToggleFilter(checked: boolean): void {
     this.checkerService.showUnavailableOnly.set(checked);
+    if (checked) {
+      this.checkerService.showDuplicatesOnly.set(false);
+    }
+  }
+
+  /**
+   * Toggles the duplicate filter state in the service
+   */
+  onToggleDuplicates(checked: boolean): void {
+    this.checkerService.showDuplicatesOnly.set(checked);
+    if (checked) {
+      this.checkerService.showUnavailableOnly.set(false);
+    }
   }
 }
