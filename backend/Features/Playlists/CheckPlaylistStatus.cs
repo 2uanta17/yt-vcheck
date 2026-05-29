@@ -1,5 +1,6 @@
 using backend.Infrastructure.YouTube;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace backend.Features.Playlists;
@@ -12,6 +13,7 @@ public static class CheckPlaylistStatus
             HttpContext context,
             [FromBody] CheckPlaylistRequest request,
             [FromServices] IYouTubeService youtubeService,
+            [FromServices] ILogger<CheckPlaylistStatus> logger,
             CancellationToken ct) =>
         {
             if (string.IsNullOrWhiteSpace(request.PlaylistId))
@@ -39,10 +41,11 @@ public static class CheckPlaylistStatus
             }
             catch (OperationCanceledException)
             {
-                // Client disconnected
+                logger.LogInformation("Client disconnected during playlist check for {PlaylistId}", request.PlaylistId);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "Error processing playlist status for {PlaylistId}", request.PlaylistId);
                 var errorJson = JsonSerializer.Serialize(ApiResponse<object>.Failure($"An error occurred: {ex.Message}"));
                 await context.Response.WriteAsync($"event: error\ndata: {errorJson}\n\n", ct);
             }

@@ -1,6 +1,7 @@
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -8,6 +9,13 @@ namespace backend.Infrastructure.YouTube;
 
 public class YouTubeService : IYouTubeService
 {
+    private readonly ILogger<YouTubeService> _logger;
+
+    public YouTubeService(ILogger<YouTubeService> logger)
+    {
+        _logger = logger;
+    }
+
     public async IAsyncEnumerable<YoutubeTrackDto> StreamPlaylistTracksAsync(
         string playlistId, 
         string apiKey,
@@ -47,11 +55,12 @@ public class YouTubeService : IYouTubeService
             }
             catch (OperationCanceledException)
             {
+                _logger.LogInformation("Streaming playlist tracks was cancelled.");
                 yield break;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // In a real app, log the error here
+                _logger.LogError(ex, "An unexpected error occurred while streaming playlist tracks for PlaylistId: {PlaylistId}", playlistId);
                 throw;
             }
 
