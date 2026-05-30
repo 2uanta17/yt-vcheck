@@ -175,8 +175,13 @@ export class CheckerService {
    * Triggers the playlist check process using a streaming approach
    * @param playlistId The ID of the YouTube playlist
    * @param apiKey Optional API key for restricted content
+   * @param countryCode Optional ISO country code for region checks
    */
-  async checkPlaylist(playlistId: string, apiKey?: string): Promise<void> {
+  async checkPlaylist(
+    playlistId: string,
+    apiKey?: string,
+    countryCode: string = 'US',
+  ): Promise<void> {
     if (!playlistId) return;
 
     this.loading.set(true);
@@ -194,7 +199,7 @@ export class CheckerService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ playlistId, apiKey }),
+        body: JSON.stringify({ playlistId, apiKey, countryCode }),
       });
 
       if (!response.ok) {

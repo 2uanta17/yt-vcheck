@@ -175,8 +175,13 @@ export class CheckerService {
    * Triggers the playlist check process by calling YouTube API directly (GitHub Pages / Standalone version)
    * @param playlistId The ID of the YouTube playlist
    * @param apiKey API key for YouTube Data API v3
+   * @param countryCode Optional ISO country code for region checks
    */
-  async checkPlaylist(playlistId: string, apiKey?: string): Promise<void> {
+  async checkPlaylist(
+    playlistId: string,
+    apiKey?: string,
+    countryCode: string = 'US',
+  ): Promise<void> {
     if (!playlistId) return;
     if (!apiKey) {
       this.error.set('API Key is required for standalone mode.');
@@ -195,7 +200,6 @@ export class CheckerService {
 
     try {
       let nextPageToken: string | undefined = undefined;
-      const countryCode = 'US'; // Default to US as in backend
 
       do {
         // 1. Fetch playlist items (50 at a time)

@@ -34,6 +34,39 @@
           />
           <mat-label>API Key</mat-label>
         </mat-form-field>
+
+        <mat-form-field appearance="outline" class="country-select">
+          <mat-label>Test Region</mat-label>
+          <mat-select [ngModel]="selectedCountry()" (ngModelChange)="selectedCountry.set($event)">
+            <div class="search-container">
+              <input
+                class="select-search-input"
+                placeholder="Search country..."
+                [ngModel]="countrySearch()"
+                (ngModelChange)="countrySearch.set($event)"
+                (keydown)="$event.stopPropagation()"
+              />
+            </div>
+            <mat-divider></mat-divider>
+            @for (country of filteredCountries(); track country.code) {
+              <mat-option [value]="country.code">{{ country.name }}</mat-option>
+            }
+            <mat-option value="CUSTOM">Custom...</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (selectedCountry() === 'CUSTOM') {
+          <mat-form-field appearance="outline" class="country-custom">
+            <mat-label>ISO Code</mat-label>
+            <input
+              matInput
+              maxlength="2"
+              placeholder="e.g. KR"
+              [ngModel]="customCountryCode()"
+              (ngModelChange)="customCountryCode.set($event)"
+            />
+          </mat-form-field>
+        }
       </div>
 
       <div class="action-row">
