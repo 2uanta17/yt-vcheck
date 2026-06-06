@@ -22,10 +22,18 @@ You may ask: why is this techstack? I don't know, I thought I might want to lear
 
 ## What it does
 
-- It identifies the "ghost" videos that are deleted, private, or region-locked.
-- It detects duplicates so you can throw the extra ones in the trash.
-- Direct links to find exactly which "Deleted video" ghost to nuke in your playlist.
-- It checks things in batches of 50 so it's not super slow.
+- **Identify Ghost Videos:** Finds deleted, private, or region-locked tracks.
+- **Find & Swap Replacements:** Hit the search icon on any dead video, pick a matching healthy video from the top 5 search results, and swap them. The app does the heavy lifting: inserting the new one at the exact same index and deleting the old dead one.
+- **Remove Duplicates:** Authorize with OAuth to bulk-delete duplicate healthy tracks and extra copies of dead videos in one click.
+- **Quota Tracking:** Displays your estimated daily API unit usage so Google doesn't slap you with a 403 block out of nowhere.
+- **Collapsible Board:** Fold up the settings card header so the config inputs don't eat up half your screen after you've scanned.
+
+## Quota Costs (Google is Stingy)
+
+Since we are serverless and calling YouTube directly:
+- **Scan:** 1 unit per 50 playlist items + 1 unit for validating status details.
+- **Search & Swap:** 200 units (100 for searching replacements, 50 for inserting, 50 for deleting the dead track).
+- **Bulk Delete:** 50 units per deleted duplicate.
 
 ## Performance and Logic
 
@@ -37,9 +45,9 @@ Since I didn't want to pay for a server, I refactored everything into the fronte
 
 ## Privacy
 
-Everything stays in your browser. I have no database, no server, and I'm not stealing your API keys. Your data is your business.
+Everything stays in your browser's local storage. I have no database, no server, and I'm not stealing your API keys or access tokens. Your data is your business.
 
-One thing though: you do need your own YouTube Data API v3 key to actually run the scan.
+One thing though: you do need your own YouTube Data API v3 key and an OAuth Client ID to actually run scans and edits.
 
 ## Getting Started
 

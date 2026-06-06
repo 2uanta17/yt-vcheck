@@ -1,59 +1,30 @@
-# Frontend
+# yt-vcheck Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.12.
+This is the Angular 21 frontend for `yt-vcheck`, customized with Material Design 3 and some signals because I felt like it.
 
-## Development server
+## Commands for running locally
 
-To start a local development server, run:
+If you're trying to build or run this thing on your machine, here are the commands you actually care about:
 
+### 1. Dev Server
 ```bash
-ng serve
+npm run start
 ```
+Starts the local development server at `http://localhost:4200/`. It has hot-reloading so changes will automatically show up.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+### 2. Build for production
 ```bash
-ng generate component component-name
+npm run build
 ```
+Compiles and optimizes everything, dumping the production files in the `dist/` directory.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+### 3. Running Unit Tests
 ```bash
-ng generate --help
+npm run test
 ```
+Runs unit tests with Vitest, in case you actually care about writing tests (which I didn't lol).
 
-## Building
+## Troubleshooting
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Styles compilation budget warning:** If you add custom styles and Angular warns about budgets, look at the `budgets` config inside `angular.json` and bump it up. I already set it to `30kB` warning and `50kB` error so the CSS doesn't fail the build.
+- **Quota errors (403):** You probably hit the daily 10,000 units limit. The app has a quota bar to warn you, but once Google cuts you off, you just have to wait until Pacific midnight for it to reset.

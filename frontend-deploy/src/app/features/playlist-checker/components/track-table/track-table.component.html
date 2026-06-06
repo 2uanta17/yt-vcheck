@@ -16,7 +16,12 @@
       [minBufferPx]="440"
       [maxBufferPx]="880"
     >
-      <div *cdkVirtualFor="let track of tracks(); let i = index" class="mat-mdc-row">
+      <div
+        *cdkVirtualFor="let track of tracks(); let i = index"
+        class="mat-mdc-row"
+        [class.track-deleted]="track.isDeleted"
+        [class.track-deleting]="track.isDeleting"
+      >
         <!-- Index Column -->
         <div class="mat-mdc-cell mat-column-index">
           <span class="index-number">{{ i + 1 }}</span>
@@ -43,16 +48,18 @@
         <!-- Status Column -->
         <div class="mat-mdc-cell mat-column-status">
           <mat-chip-set>
-            @if (track.isUnavailable) {
-              @if (track.isSafeToRemove) {
-                <mat-chip-row highlighted class="status-chip duplicate-warning">
-                  {{ track.statusDetails }}
-                </mat-chip-row>
-              } @else {
-                <mat-chip-row highlighted class="status-chip unavailable">
-                  {{ track.unavailableReason }}
-                </mat-chip-row>
-              }
+            @if (track.isDeleted) {
+              <mat-chip-row class="status-chip deleted-success"> Deleted </mat-chip-row>
+            } @else if (track.isDeleting) {
+              <mat-chip-row class="status-chip deleting-warning"> Deleting... </mat-chip-row>
+            } @else if (track.isSafeToRemove) {
+              <mat-chip-row highlighted class="status-chip duplicate-warning">
+                {{ track.statusDetails }}
+              </mat-chip-row>
+            } @else if (track.isUnavailable) {
+              <mat-chip-row highlighted class="status-chip unavailable">
+                {{ track.unavailableReason }}
+              </mat-chip-row>
             } @else {
               <mat-chip-row class="status-chip available"> Available </mat-chip-row>
             }
@@ -61,24 +68,50 @@
 
         <!-- Actions Column -->
         <div class="mat-mdc-cell mat-column-actions">
-          <div class="action-buttons">
+          <div class="action-buttons" [class.disabled-actions]="track.isDeleted">
             <button
               mat-icon-button
               (click)="viewInPlaylist(track)"
               title="View in Playlist"
-              [disabled]="!playlistId()"
+              [disabled]="!playlistId() || track.isDeleted || track.isDeleting"
             >
               <mat-icon>playlist_play</mat-icon>
             </button>
-            <button mat-icon-button (click)="copyVideoId(track.videoId)" title="Copy Video ID">
+            <button
+              mat-icon-button
+              (click)="copyVideoId(track.videoId)"
+              title="Copy Video ID"
+              [disabled]="track.isDeleted || track.isDeleting"
+            >
               <mat-icon>content_copy</mat-icon>
             </button>
-            <button mat-icon-button (click)="searchYouTube(track)" title="Search on YouTube">
+            <button
+              mat-icon-button
+              (click)="searchYouTube(track)"
+              title="Search on YouTube"
+              [disabled]="track.isDeleted || track.isDeleting"
+            >
               <mat-icon>open_in_new</mat-icon>
             </button>
-            <button mat-icon-button (click)="searchGoogle(track)" title="Search on Google">
-              <mat-icon>search</mat-icon>
-            </button>
+            @if (track.isUnavailable && !track.isDeleted) {
+              <button
+                mat-icon-button
+                (click)="openSearch.emit(track)"
+                title="Find Replacement"
+                [disabled]="track.isDeleting"
+              >
+                <mat-icon>find_replace</mat-icon>
+              </button>
+            } @else {
+              <button
+                mat-icon-button
+                (click)="searchGoogle(track)"
+                title="Search on Google"
+                [disabled]="track.isDeleted || track.isDeleting"
+              >
+                <mat-icon>search</mat-icon>
+              </button>
+            }
           </div>
         </div>
       </div>

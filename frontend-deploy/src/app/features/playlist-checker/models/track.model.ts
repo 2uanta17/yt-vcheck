@@ -7,4 +7,8 @@ export interface Track {
   unavailableReason: string;
   statusDetails?: string;
   isSafeToRemove?: boolean;
+  playlistItemId?: string;
+  isDeleting?: boolean;
+  isDeleted?: boolean;
+  position?: number;
 }
