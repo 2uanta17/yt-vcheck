@@ -1,7 +1,7 @@
 # yt-vcheck
 
 <p align="center">
-  <img alt="yt-vcheck screenshot" src="https://github.com/user-attachments/assets/f25faa7f-7efb-4e11-ad78-c0b28f478415" width="800">
+  <img alt="yt-vcheck screenshot" src="https://github.com/user-attachments/assets/67bb228f-b80d-4ac3-875e-c475c980cba0" width="800">
 </p>
 
 ## The Problem
@@ -12,18 +12,18 @@ As someone who listens to music on Youtube, the fucking platform keeps region-lo
 
 This web app uses:
 
-- Angular (with Signals, because why not)
+- Angular (with Signals)
 - Angular Material 3
 - Angular CDK Virtual Scroll
 - YouTube Data API v3
-- .NET 9 Minimal API (it's just sitting in the folder lol)
+- .NET 9 Minimal API (it's just sitting in the folder)
 
 You may ask: why is this techstack? I don't know, I thought I might want to learn Minimal APIs and Angular so I vibecoded using it, in the end I learned nothing though.
 
 ## What it does
 
 - **Identify Ghost Videos:** Finds deleted, private, or region-locked tracks.
-- **Find & Swap Replacements:** Hit the search icon on any dead video, pick a matching healthy video from the top 5 search results, and swap them. The app does the heavy lifting: inserting the new one at the exact same index and deleting the old dead one.
+- **Find & Swap Replacements:** Hit the search icon on any dead video, pick a matching healthy video from the top 5 search results, and swap them. The app does the heavy lifting: inserting the new one at the exact same index and deleting the old dead one. Sometimes it doesn't find the correct one.
 - **Remove Duplicates:** Authorize with OAuth to bulk-delete duplicate healthy tracks and extra copies of dead videos in one click.
 - **Quota Tracking:** Displays your estimated daily API unit usage so Google doesn't slap you with a 403 block out of nowhere.
 - **Collapsible Board:** Fold up the settings card header so the config inputs don't eat up half your screen after you've scanned.
@@ -61,6 +61,23 @@ ng serve
 ```
 
 Go to `http://localhost:4200/`, paste your API key, and find out what's missing from your playlists.
+
+## Google OAuth Setup (Because Google makes simple things hard)
+
+If you want the Swap or Delete features to actually work, you need an OAuth Client ID from Google Cloud Console. Here is how to configure it:
+
+1. **Enable the API:** Go to [Google Cloud Console](https://console.cloud.google.com/), select your project, search for **YouTube Data API v3**, and click **Enable**.
+2. **Consent Screen Sandbox:** Go to **OAuth consent screen** in the sidebar. Select **External**, fill in the required fields, and add the `.../auth/youtube` scope (needed to edit playlists).
+3. **Add Test Users (Crucial!):** Since the app is in testing/sandbox mode, Google blocks everyone by default. Go to the **Test users** section on the consent screen and add the exact email address of the YouTube channel you want to edit. If you skip this, you will get a `403: access_denied` error.
+4. **Create Web Credentials:** Navigate to **Credentials** > **+ Create Credentials** > **OAuth client ID**. Select **Web application** as the type.
+5. **Set Authorized URIs (Trailing Slashes Matter!):**
+   * **Local Dev:**
+     * Authorized JavaScript origin: `http://localhost:4200`
+     * Authorized redirect URI: `http://localhost:4200/`
+   * **GitHub Pages:**
+     * Authorized JavaScript origin: `https://2uanta17.github.io`
+     * Authorized redirect URI: `https://2uanta17.github.io/yt-vcheck/`
+6. **Copy & Authorize:** Copy the generated Client ID (looks like `xxxx.apps.googleusercontent.com`), paste it into the OAuth Client ID field on the app settings board, click **Authorize**, bypass the "Unverified App" warning (click *Advanced > Go to yt-vcheck*), and you are good to go!
 
 ---
 
