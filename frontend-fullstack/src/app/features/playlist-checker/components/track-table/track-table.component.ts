@@ -1,7 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,6 +27,7 @@ export class TrackTableComponent {
 
   tracks = input.required<Track[]>();
   playlistId = input<string | null>(null);
+  openSearch = output<Track>();
   displayedColumns: string[] = ['thumbnail', 'details', 'status', 'actions'];
 
   copyVideoId(videoId: string): void {

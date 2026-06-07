@@ -7,6 +7,8 @@ public record YoutubeTrackDto(
     string ThumbnailUrl,
     bool IsUnavailable,
     string? UnavailableReason,
+    string? PlaylistItemId = null,
+    long? Position = null,
     string? StatusDetails = null,
     bool IsSafeToRemove = false
 );

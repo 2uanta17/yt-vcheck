@@ -61,6 +61,19 @@
         opacity: 1;
       }
     }
+
+    &.track-deleted {
+      opacity: 0.45;
+      background-color: rgba(0, 0, 0, 0.02) !important;
+      
+      .track-title {
+        text-decoration: line-through;
+      }
+    }
+
+    &.track-deleting {
+      background-color: rgba(237, 108, 2, 0.04) !important;
+    }
   }
 
   .mat-mdc-header-cell,
@@ -177,6 +190,18 @@
     --mdc-chip-elevated-container-color: rgba(237, 108, 2, 0.1);
     --mdc-chip-label-text-color: #ed6c02;
   }
+
+  &.deleted-success {
+    --mdc-chip-elevated-container-color: rgba(46, 125, 50, 0.15);
+    --mdc-chip-label-text-color: #2e7d32;
+    border: 1px solid rgba(46, 125, 50, 0.3) !important;
+  }
+
+  &.deleting-warning {
+    --mdc-chip-elevated-container-color: rgba(237, 108, 2, 0.15);
+    --mdc-chip-label-text-color: #ed6c02;
+    animation: chip-pulse 1.5s infinite ease-in-out;
+  }
 }
 
 .action-buttons {
@@ -185,6 +210,11 @@
   gap: 4px;
   opacity: 0.6; // Subtle by default like YT
   transition: opacity 0.2s;
+
+  &.disabled-actions {
+    pointer-events: none;
+    opacity: 0.15 !important;
+  }
 
   @media (max-width: 768px) {
     opacity: 1;
@@ -266,4 +296,16 @@
 
 .mat-column-actions {
   flex: 0 0 140px;
+}
+
+@keyframes chip-pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }

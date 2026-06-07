@@ -3,71 +3,95 @@
     <mat-card-header>
       <mat-card-title>YouTube Playlist Checker</mat-card-title>
       <mat-card-subtitle>Scan playlists for unavailable or deleted videos</mat-card-subtitle>
+      <span class="header-spacer"></span>
+      <button
+        mat-icon-button
+        (click)="isSettingsCollapsed.set(!isSettingsCollapsed())"
+        [title]="isSettingsCollapsed() ? 'Expand settings' : 'Collapse settings'"
+        type="button"
+      >
+        <mat-icon>{{ isSettingsCollapsed() ? 'expand_more' : 'expand_less' }}</mat-icon>
+      </button>
     </mat-card-header>
 
     <mat-card-content>
-      <div class="form-row">
-        <mat-form-field appearance="outline" class="flex-grow">
-          <mat-label>YouTube Playlist ID or URL</mat-label>
-          <input
-            matInput
-            placeholder="Paste Playlist ID or URL here"
-            [ngModel]="playlistId()"
-            (ngModelChange)="playlistId.set($event); idError.set(null)"
-            name="playlistId"
-            required
-          />
-          @if (idError()) {
-            <mat-error>{{ idError() }}</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="flex-grow">
-          <input
-            matInput
-            type="password"
-            placeholder="Your YouTube Data API v3 Key"
-            [ngModel]="apiKey()"
-            (ngModelChange)="apiKey.set($event)"
-            name="apiKey"
-            required
-          />
-          <mat-label>API Key</mat-label>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="country-select">
-          <mat-label>Test Region</mat-label>
-          <mat-select [ngModel]="selectedCountry()" (ngModelChange)="selectedCountry.set($event)">
-            <div class="search-container">
-              <input
-                class="select-search-input"
-                placeholder="Search country..."
-                [ngModel]="countrySearch()"
-                (ngModelChange)="countrySearch.set($event)"
-                (keydown)="$event.stopPropagation()"
-              />
-            </div>
-            <mat-divider></mat-divider>
-            @for (country of filteredCountries(); track country.code) {
-              <mat-option [value]="country.code">{{ country.name }}</mat-option>
-            }
-            <mat-option value="CUSTOM">Custom...</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        @if (selectedCountry() === 'CUSTOM') {
-          <mat-form-field appearance="outline" class="country-custom">
-            <mat-label>ISO Code</mat-label>
+      @if (!isSettingsCollapsed()) {
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="flex-grow">
+            <mat-label>YouTube Playlist ID or URL</mat-label>
             <input
               matInput
-              maxlength="2"
-              placeholder="e.g. KR"
-              [ngModel]="customCountryCode()"
-              (ngModelChange)="customCountryCode.set($event)"
+              placeholder="Paste Playlist ID or URL here"
+              [ngModel]="playlistId()"
+              (ngModelChange)="playlistId.set($event); idError.set(null)"
+              name="playlistId"
+              required
             />
+            @if (idError()) {
+              <mat-error>{{ idError() }}</mat-error>
+            }
           </mat-form-field>
-        }
-      </div>
+
+          <mat-form-field appearance="outline" class="flex-grow">
+            <input
+              matInput
+              type="password"
+              placeholder="Your YouTube Data API v3 Key"
+              [ngModel]="apiKey()"
+              (ngModelChange)="apiKey.set($event)"
+              name="apiKey"
+              required
+            />
+            <mat-label>API Key</mat-label>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="flex-grow">
+            <input
+              matInput
+              placeholder="Google OAuth Client ID"
+              [ngModel]="oauthClientId()"
+              (ngModelChange)="oauthClientId.set($event)"
+              name="oauthClientId"
+            />
+            <mat-label>OAuth Client ID (For Deletion)</mat-label>
+          </mat-form-field>
+
+          <div class="region-container">
+            <mat-form-field appearance="outline" class="country-select">
+              <mat-label>Test Region</mat-label>
+              <mat-select [ngModel]="selectedCountry()" (ngModelChange)="selectedCountry.set($event)">
+                <div class="search-container">
+                  <input
+                    class="select-search-input"
+                    placeholder="Search country..."
+                    [ngModel]="countrySearch()"
+                    (ngModelChange)="countrySearch.set($event)"
+                    (keydown)="$event.stopPropagation()"
+                  />
+                </div>
+                <mat-divider></mat-divider>
+                @for (country of filteredCountries(); track country.code) {
+                  <mat-option [value]="country.code">{{ country.name }}</mat-option>
+                }
+                <mat-option value="CUSTOM">Custom...</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            @if (selectedCountry() === 'CUSTOM') {
+              <mat-form-field appearance="outline" class="country-custom">
+                <mat-label>ISO Code</mat-label>
+                <input
+                  matInput
+                  maxlength="2"
+                  placeholder="e.g. KR"
+                  [ngModel]="customCountryCode()"
+                  (ngModelChange)="customCountryCode.set($event)"
+                />
+              </mat-form-field>
+            }
+          </div>
+        </div>
+      }
 
       <div class="action-row">
         <div class="left-actions">
@@ -75,11 +99,37 @@
             mat-flat-button
             color="primary"
             (click)="onScan()"
-            [disabled]="!playlistId() || !apiKey() || checkerService.isLoading()"
+            [disabled]="!playlistId() || !apiKey() || checkerService.isLoading() || isDeleting()"
           >
-            <mat-icon>search</mat-icon>
+            <mat-icon>playlist_add_check</mat-icon>
             Scan Playlist
           </button>
+
+          @if (oauthClientId()) {
+            <button
+              mat-stroked-button
+              (click)="onAuthorize()"
+              [color]="oauthToken() ? 'accent' : 'primary'"
+              [disabled]="isDeleting() || checkerService.isLoading()"
+              class="oauth-auth-btn"
+            >
+              <mat-icon>{{ oauthToken() ? 'verified_user' : 'vpn_key' }}</mat-icon>
+              {{ oauthToken() ? 'Authorized' : 'Authorize Deletion' }}
+            </button>
+          }
+
+          @if (oauthToken() && checkerService.duplicateTracksCount() > 0) {
+            <button
+              mat-flat-button
+              color="warn"
+              (click)="onRemoveDuplicates()"
+              [disabled]="isDeleting() || checkerService.isLoading()"
+              class="remove-dupes-btn"
+            >
+              <mat-icon>playlist_remove</mat-icon>
+              Remove All Duplicates ({{ checkerService.duplicateTracksCount() }})
+            </button>
+          }
 
           <mat-form-field appearance="outline" class="search-field">
             <mat-label>Search tracks...</mat-label>
@@ -88,6 +138,7 @@
               [ngModel]="checkerService.searchTerm()"
               (ngModelChange)="checkerService.searchTerm.set($event)"
               placeholder="Title or channel"
+              [disabled]="isDeleting()"
             />
           </mat-form-field>
         </div>
@@ -120,6 +171,7 @@
             <mat-slide-toggle
               [checked]="checkerService.showUnavailableOnly()"
               (change)="onToggleFilter($event.checked)"
+              [disabled]="isDeleting()"
             >
               Show Unavailable
             </mat-slide-toggle>
@@ -127,12 +179,44 @@
             <mat-slide-toggle
               [checked]="checkerService.showDuplicatesOnly()"
               (change)="onToggleDuplicates($event.checked)"
+              [disabled]="isDeleting()"
             >
               Show Duplicates
             </mat-slide-toggle>
           </div>
         </div>
       </div>
+
+      <!-- Quota usage bar -->
+      <div class="quota-container">
+        <div class="quota-info">
+          <span class="quota-title">Daily API Quota Used (Est.):</span>
+          <span class="quota-stats">
+            <strong>{{ checkerService.quotaUsed() | number }}</strong> / 10,000 units ({{ checkerService.quotaPercentage() }}%)
+          </span>
+        </div>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="checkerService.quotaPercentage()"
+          [class.high-quota]="checkerService.quotaPercentage() >= 80"
+          [class.mid-quota]="checkerService.quotaPercentage() >= 50 && checkerService.quotaPercentage() < 80"
+        ></mat-progress-bar>
+      </div>
+
+      <!-- Bulk deletion progress bar -->
+      @if (isDeleting() && deletionProgress(); as progress) {
+        <div class="deletion-progress-container">
+          <div class="progress-info">
+            <span class="progress-title">Deleting Duplicates...</span>
+            <span class="progress-stats"><strong>{{ progress.current }}</strong> / {{ progress.total }} deleted</span>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="(progress.current / progress.total) * 100"
+            color="accent"
+          ></mat-progress-bar>
+        </div>
+      }
     </mat-card-content>
 
     @if (checkerService.isLoading()) {
@@ -157,6 +241,92 @@
     <app-track-table
       [tracks]="checkerService.filteredTracks()"
       [playlistId]="checkerService.currentPlaylistId()"
+      (openSearch)="onOpenSearch($event)"
     ></app-track-table>
   </div>
+
+  <!-- Search & Replace Overlay Modal -->
+  @if (activeSearchTrack(); as track) {
+    <div class="modal-overlay" (click)="onCloseSearch()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+          <h3>Find Replacement Video</h3>
+          <button mat-icon-button (click)="onCloseSearch()" title="Close" [disabled]="isSwapping()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="modal-search-bar">
+          <mat-form-field appearance="outline" class="flex-grow">
+            <mat-label>Search Query</mat-label>
+            <input
+              matInput
+              [ngModel]="replacementSearchQuery()"
+              (ngModelChange)="replacementSearchQuery.set($event)"
+              placeholder="Enter video title, artist, or URL"
+              (keydown.enter)="executeReplacementSearch()"
+              [disabled]="isSwapping() || isSearchingReplacements()"
+            />
+          </mat-form-field>
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="executeReplacementSearch()"
+            [disabled]="isSwapping() || isSearchingReplacements() || !replacementSearchQuery().trim()"
+          >
+            <mat-icon>search</mat-icon>
+            Search
+          </button>
+        </div>
+
+        <!-- Progress/Loading bar -->
+        @if (isSearchingReplacements() || isSwapping()) {
+          <mat-progress-bar
+            mode="indeterminate"
+            [color]="isSwapping() ? 'accent' : 'primary'"
+            class="modal-progress"
+          ></mat-progress-bar>
+          <div class="modal-status-text">
+            {{ isSwapping() ? 'Swapping playlist items (inserting & deleting)...' : 'Searching YouTube...' }}
+          </div>
+        }
+
+        <!-- Search Results -->
+        <div class="modal-results-container">
+          @if (!isSearchingReplacements() && searchResults().length === 0) {
+            <div class="no-results">
+              <mat-icon>info</mat-icon>
+              <p>No results found or search query empty.</p>
+            </div>
+          } @else if (!isSearchingReplacements() && searchResults().length > 0) {
+            <div class="results-list">
+              @for (result of searchResults(); track result.videoId) {
+                <div class="result-card" [class.disabled-card]="isSwapping()">
+                  <img [src]="result.thumbnailUrl" alt="Result Thumbnail" class="result-thumbnail" />
+                  <div class="result-details">
+                    <span class="result-title" [title]="result.title" [innerHTML]="result.title"></span>
+                    <span class="result-channel">{{ result.channelTitle }}</span>
+                    @if (result.publishedAt) {
+                      <span class="result-date">Published: {{ result.publishedAt | date:'mediumDate' }}</span>
+                    }
+                  </div>
+                  <button
+                    mat-flat-button
+                    color="accent"
+                    (click)="onSwap(result)"
+                    [disabled]="isSwapping() || isSearchingReplacements()"
+                  >
+                    <mat-icon>swap_horiz</mat-icon>
+                    Swap
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>

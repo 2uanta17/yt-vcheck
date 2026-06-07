@@ -121,7 +121,9 @@ public class YouTubeService : IYouTubeService
                     ChannelTitle: item.Snippet.VideoOwnerChannelTitle ?? item.Snippet.ChannelTitle ?? "Unknown Channel",
                     ThumbnailUrl: item.Snippet.Thumbnails?.Maxres?.Url ?? item.Snippet.Thumbnails?.Medium?.Url ?? item.Snippet.Thumbnails?.Default__?.Url ?? "",
                     IsUnavailable: isUnavailable,
-                    UnavailableReason: reason
+                    UnavailableReason: reason,
+                    PlaylistItemId: item.Id,
+                    Position: item.Snippet.Position
                 );
             }
 
