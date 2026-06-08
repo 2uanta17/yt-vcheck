@@ -47,11 +47,11 @@ Since I didn't want to pay for a server, I refactored everything into the fronte
 
 Everything stays in your browser's local storage. I have no database, no server, and I'm not stealing your API keys or access tokens. Your data is your business.
 
-One thing though: you do need your own YouTube Data API v3 key and an OAuth Client ID to actually run scans and edits.
+One thing though: you do need your own YouTube Data API v3 key to run scans. For editing functions (swapping and removing duplicates), you can use the pre-configured default Client ID.
 
 ## Getting Started
 
-If you want to run this locally for some reason:
+If you want to run this locally:
 
 ```bash
 git clone https://github.com/2uanta17/yt-vcheck.git
@@ -62,22 +62,24 @@ ng serve
 
 Go to `http://localhost:4200/`, paste your API key, and find out what's missing from your playlists.
 
-## Google OAuth Setup (Because Google makes simple things hard)
+## Google OAuth Setup (For Swapping & Deletion)
 
-If you want the Swap or Delete features to actually work, you need an OAuth Client ID from Google Cloud Console. Here is how to configure it:
+The app comes pre-configured with a default OAuth Client ID. You do **not** need to create or configure a Client ID of your own:
+1. Paste your **YouTube Data API v3 Key** in the settings.
+2. Click **Authorize Deletion** (or swap a video).
+3. Log in with your Google account.
+4. Bypass the "Unverified App" warning (click *Advanced* > *Go to yt-vcheck*).
 
+*(Optional)* **Using a Custom OAuth Client ID:**
+If you prefer to configure and use your own Google Cloud project/Client ID:
 1. **Enable the API:** Go to [Google Cloud Console](https://console.cloud.google.com/), select your project, search for **YouTube Data API v3**, and click **Enable**.
-2. **Consent Screen Sandbox:** Go to **OAuth consent screen** in the sidebar. Select **External**, fill in the required fields, and add the `.../auth/youtube` scope (needed to edit playlists).
-3. **Add Test Users (Crucial!):** Since the app is in testing/sandbox mode, Google blocks everyone by default. Go to the **Test users** section on the consent screen and add the exact email address of the YouTube channel you want to edit. If you skip this, you will get a `403: access_denied` error.
-4. **Create Web Credentials:** Navigate to **Credentials** > **+ Create Credentials** > **OAuth client ID**. Select **Web application** as the type.
-5. **Set Authorized URIs (Trailing Slashes Matter!):**
-   * **Local Dev:**
-     * Authorized JavaScript origin: `http://localhost:4200`
-     * Authorized redirect URI: `http://localhost:4200/`
-   * **GitHub Pages:**
-     * Authorized JavaScript origin: `https://2uanta17.github.io`
-     * Authorized redirect URI: `https://2uanta17.github.io/yt-vcheck/`
-6. **Copy & Authorize:** Copy the generated Client ID (looks like `xxxx.apps.googleusercontent.com`), paste it into the OAuth Client ID field on the app settings board, click **Authorize**, bypass the "Unverified App" warning (click *Advanced > Go to yt-vcheck*), and you are good to go!
+2. **Consent Screen Setup:** Set up the OAuth consent screen with the `.../auth/youtube` scope (required for editing playlists).
+3. **Add Test Users (Crucial!):** Since the consent screen is in Sandbox mode, you **must** add the email addresses of the YouTube channel(s) you wish to edit under the **Test users** tab, or Google will throw a `403: access_denied` error.
+4. **Create Web Credentials:** Navigate to **Credentials** > **+ Create Credentials** > **OAuth client ID** (Web application).
+5. **Set Authorized URIs:**
+   * **Local Dev:** Origin: `http://localhost:4200`, Redirect URI: `http://localhost:4200/`
+   * **GitHub Pages:** Origin: `https://2uanta17.github.io`, Redirect URI: `https://2uanta17.github.io/yt-vcheck/`
+6. **Copy & Override:** Paste your generated Client ID into the OAuth Client ID field on the settings board to overwrite the default pre-configured key.
 
 ---
 

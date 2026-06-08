@@ -26,6 +26,9 @@ const STORAGE_KEYS = {
   SETTINGS_COLLAPSED: 'yt_vcheck_settings_collapsed',
 };
 
+// Enter your default Google OAuth Client ID here to pre-fill it for users
+const DEFAULT_OAUTH_CLIENT_ID = '33667617599-2b85kesrhm6tjs61gbuc564nlt0oqe3l.apps.googleusercontent.com';
+
 @Component({
   selector: 'app-playlist-checker',
   templateUrl: './playlist-checker.component.html',
@@ -56,7 +59,9 @@ export class PlaylistCheckerComponent {
   // Local signals for form inputs
   playlistId = signal(this.getInitialValue(STORAGE_KEYS.PLAYLIST_ID));
   apiKey = signal(this.getInitialValue(STORAGE_KEYS.API_KEY));
-  oauthClientId = signal(this.getInitialValue(STORAGE_KEYS.OAUTH_CLIENT_ID));
+  oauthClientId = signal(
+    this.getInitialValue(STORAGE_KEYS.OAUTH_CLIENT_ID) || DEFAULT_OAUTH_CLIENT_ID,
+  );
   selectedCountry = signal(this.getInitialValue(STORAGE_KEYS.COUNTRY_CODE) || 'US');
   customCountryCode = signal(this.getInitialValue(STORAGE_KEYS.CUSTOM_COUNTRY_CODE));
   idError = signal<string | null>(null);
