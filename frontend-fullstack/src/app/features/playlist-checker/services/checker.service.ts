@@ -481,20 +481,18 @@ export class CheckerService {
   }
 
   /**
-   * Inserts a video into the playlist at a specific position (costs 50 quota units)
+   * Inserts a video into the playlist (costs 50 quota units)
    * Requires OAuth 2.0 Access Token
    */
   async insertPlaylistItem(
     playlistId: string,
     videoId: string,
-    position: number,
     accessToken: string,
   ): Promise<string> {
     const insertUrl = 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet';
     const body = {
       snippet: {
         playlistId,
-        position,
         resourceId: {
           kind: 'youtube#video',
           videoId,

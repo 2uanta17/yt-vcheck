@@ -444,18 +444,17 @@ export class PlaylistCheckerComponent {
     const oldPlaylistItemId = oldTrack.playlistItemId;
     if (!oldPlaylistItemId) return;
 
-    const confirmMsg = `Are you sure you want to replace this video?\n\nThis will insert "${newVideo.title}" at index ${position + 1} and delete the old video.\nThis operation will consume 100 quota units.`;
+    const confirmMsg = `Are you sure you want to replace this video?\n\nThis will insert "${newVideo.title}" into the playlist and delete the old video.\nThis operation will consume 100 quota units.`;
     if (!confirm(confirmMsg)) return;
 
     this.isSwapping.set(true);
     try {
-      console.log(`[Swap] Starting swap: replacing old track ID ${oldPlaylistItemId} at position ${position} with new video ${newVideo.videoId}`);
+      console.log(`[Swap] Starting swap: replacing old track ID ${oldPlaylistItemId} with new video ${newVideo.videoId}`);
 
-      // 1. Insert the new video at the exact position
+      // 1. Insert the new video
       const newPlaylistItemId = await this.checkerService.insertPlaylistItem(
         playlistId,
         newVideo.videoId,
-        position,
         token
       );
       console.log(`[Swap] Successfully inserted new video. New playlistItemId: ${newPlaylistItemId}`);

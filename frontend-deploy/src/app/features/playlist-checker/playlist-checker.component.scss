@@ -248,21 +248,36 @@
         flex-grow: 1;
 
         @media (max-width: 600px) {
-          justify-content: space-between;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
           width: 100%;
         }
 
         .toggles {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 6px;
+
+          @media (max-width: 600px) {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+          }
         }
 
         mat-slide-toggle {
           transform: scale(0.9);
           transform-origin: left center;
+          margin-right: -10px;
           font-size: 13px;
           font-weight: 500;
+
+          @media (max-width: 600px) {
+            margin-right: 0;
+            margin-bottom: 4px;
+          }
 
           ::ng-deep .mdc-label {
             padding-left: 8px;
