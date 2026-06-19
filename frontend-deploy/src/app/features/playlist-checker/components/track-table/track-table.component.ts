@@ -28,6 +28,7 @@ export class TrackTableComponent {
   tracks = input.required<Track[]>();
   playlistId = input<string | null>(null);
   openSearch = output<Track>();
+  deleteTrack = output<Track>();
   displayedColumns: string[] = ['thumbnail', 'details', 'status', 'actions'];
 
   copyVideoId(videoId: string): void {

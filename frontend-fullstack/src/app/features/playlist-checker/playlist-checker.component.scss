@@ -255,6 +255,7 @@
         .toggles {
           display: flex;
           align-items: center;
+          gap: 12px;
         }
 
         mat-slide-toggle {

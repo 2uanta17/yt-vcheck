@@ -4,6 +4,7 @@ import { Track } from '../models/track.model';
 const CACHE_KEY = 'yt_vcheck_last_results';
 const TOGGLE_KEY = 'yt_vcheck_toggle_state';
 const DUPE_TOGGLE_KEY = 'yt_vcheck_dupe_toggle_state';
+const DUPE_TITLE_TOGGLE_KEY = 'yt_vcheck_dupe_title_toggle_state';
 
 @Injectable({
   providedIn: 'root',
@@ -99,6 +100,11 @@ export class CheckerService {
   showDuplicatesOnly = signal<boolean>(this.getInitialDupeToggle());
 
   /**
+   * Filter toggle to show only duplicate tracks (title only check)
+   */
+  showDuplicatesTitleOnly = signal<boolean>(this.getInitialDupeTitleToggle());
+
+  /**
    * Search term for filtering the grid
    */
   searchTerm = signal<string>('');
@@ -113,6 +119,13 @@ export class CheckerService {
   private getInitialDupeToggle(): boolean {
     if (typeof window !== 'undefined') {
       return localStorage.getItem(DUPE_TOGGLE_KEY) === 'true';
+    }
+    return false;
+  }
+
+  private getInitialDupeTitleToggle(): boolean {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(DUPE_TITLE_TOGGLE_KEY) === 'true';
     }
     return false;
   }
@@ -150,11 +163,44 @@ export class CheckerService {
     const tracks = this.processedTracks();
     const showUnavailable = this.showUnavailableOnly();
     const showDuplicates = this.showDuplicatesOnly();
+    const showDuplicatesTitle = this.showDuplicatesTitleOnly();
     const searchTerm = this.searchTerm().toLowerCase();
 
     let filtered = tracks;
 
-    if (showDuplicates) {
+    if (showDuplicatesTitle) {
+      const titleCounts = new Map<string, number>();
+      const firstIndexMap = new Map<string, number>();
+      
+      tracks.forEach((t, index) => {
+        if (!t.isDeleted) {
+          const title = t.title.toLowerCase().trim();
+          titleCounts.set(title, (titleCounts.get(title) || 0) + 1);
+          if (!firstIndexMap.has(title)) {
+            firstIndexMap.set(title, index);
+          }
+        }
+      });
+
+      filtered = filtered.filter((track) => {
+        if (track.isDeleted) return false;
+        const title = track.title.toLowerCase().trim();
+        return (titleCounts.get(title) || 0) > 1;
+      });
+
+      filtered = [...filtered].sort((a, b) => {
+        const titleA = a.title.toLowerCase().trim();
+        const titleB = b.title.toLowerCase().trim();
+        
+        if (titleA === titleB) {
+          return (a.position ?? 0) - (b.position ?? 0);
+        }
+        
+        const firstIdxA = firstIndexMap.get(titleA) ?? 0;
+        const firstIdxB = firstIndexMap.get(titleB) ?? 0;
+        return firstIdxA - firstIdxB;
+      });
+    } else if (showDuplicates) {
       filtered = filtered.filter((track) => track.isSafeToRemove);
     } else if (showUnavailable) {
       filtered = filtered.filter((track) => track.isUnavailable);
@@ -202,6 +248,13 @@ export class CheckerService {
       const val = this.showDuplicatesOnly();
       if (typeof window !== 'undefined') {
         localStorage.setItem(DUPE_TOGGLE_KEY, String(val));
+      }
+    });
+
+    effect(() => {
+      const val = this.showDuplicatesTitleOnly();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(DUPE_TITLE_TOGGLE_KEY, String(val));
       }
     });
   }

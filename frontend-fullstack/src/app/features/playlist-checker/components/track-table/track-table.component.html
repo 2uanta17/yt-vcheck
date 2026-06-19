@@ -112,6 +112,17 @@
                 <mat-icon>search</mat-icon>
               </button>
             }
+            @if (!track.isDeleted) {
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteTrack.emit(track)"
+                title="Delete from Playlist"
+                [disabled]="track.isDeleting"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
           </div>
         </div>
       </div>

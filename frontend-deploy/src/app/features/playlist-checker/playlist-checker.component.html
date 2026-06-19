@@ -183,6 +183,14 @@
             >
               Show Duplicates
             </mat-slide-toggle>
+
+            <mat-slide-toggle
+              [checked]="checkerService.showDuplicatesTitleOnly()"
+              (change)="onToggleDuplicatesTitleOnly($event.checked)"
+              [disabled]="isDeleting()"
+            >
+              Show Duplicates (Title)
+            </mat-slide-toggle>
           </div>
         </div>
       </div>
@@ -242,6 +250,7 @@
       [tracks]="checkerService.filteredTracks()"
       [playlistId]="checkerService.currentPlaylistId()"
       (openSearch)="onOpenSearch($event)"
+      (deleteTrack)="onDeleteTrack($event)"
     ></app-track-table>
   </div>
 

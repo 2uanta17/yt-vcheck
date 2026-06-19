@@ -309,6 +309,7 @@ export class PlaylistCheckerComponent {
     this.checkerService.showUnavailableOnly.set(checked);
     if (checked) {
       this.checkerService.showDuplicatesOnly.set(false);
+      this.checkerService.showDuplicatesTitleOnly.set(false);
     }
   }
 
@@ -319,6 +320,63 @@ export class PlaylistCheckerComponent {
     this.checkerService.showDuplicatesOnly.set(checked);
     if (checked) {
       this.checkerService.showUnavailableOnly.set(false);
+      this.checkerService.showDuplicatesTitleOnly.set(false);
+    }
+  }
+
+  /**
+   * Toggles the duplicate filter state (title only check) in the service
+   */
+  onToggleDuplicatesTitleOnly(checked: boolean): void {
+    this.checkerService.showDuplicatesTitleOnly.set(checked);
+    if (checked) {
+      this.checkerService.showUnavailableOnly.set(false);
+      this.checkerService.showDuplicatesOnly.set(false);
+    }
+  }
+
+  /**
+   * Deletes a single track from the playlist
+   */
+  async onDeleteTrack(track: Track): Promise<void> {
+    const token = this.oauthToken();
+    if (!token) {
+      alert('Please click "Authorize Deletion" to sign in first.');
+      return;
+    }
+
+    if (!track.playlistItemId) return;
+
+    const confirmMsg = `Are you sure you want to delete "${track.title}" from this playlist? This will consume 50 units of your YouTube API quota.`;
+    if (!confirm(confirmMsg)) return;
+
+    // Mark track as deleting in local state
+    this.checkerService.updateTrackStatus(track.playlistItemId, {
+      isDeleting: true,
+      statusDetails: 'Deleting...',
+    });
+
+    try {
+      await this.checkerService.deletePlaylistItem(track.playlistItemId, token);
+      
+      // Mark track as deleted successfully
+      this.checkerService.updateTrackStatus(track.playlistItemId, {
+        isDeleting: false,
+        isDeleted: true,
+        isSafeToRemove: false,
+        statusDetails: 'Deleted',
+      });
+    } catch (err: any) {
+      if (err.message === 'QUOTA_EXCEEDED') {
+        alert('YouTube API Quota exceeded. Deletion failed.');
+      } else {
+        console.error(`Failed to delete track ${track.playlistItemId}:`, err);
+        alert(err.message || 'Failed to delete track.');
+      }
+      this.checkerService.updateTrackStatus(track.playlistItemId, {
+        isDeleting: false,
+        statusDetails: 'Delete Failed',
+      });
     }
   }
 
